@@ -1,3 +1,10 @@
+.cache
+.DS_Store
+doc
+
+dist/index.*
+dist/main.*
+
 # Logs
 logs
 *.log

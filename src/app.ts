@@ -3,7 +3,7 @@ import { Bodies, Body as MBody, Engine, Events, Runner, Vector, Vertices, World 
 import { ISvgPath, ISvgStyle, IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
-import { drawFrame, getFrameBodies } from './frame'
+import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 (window as any).decomp = require('poly-decomp')
@@ -34,7 +34,7 @@ export default class App {
     this.canvas = args.canvas
     this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
     this.engine = Engine.create()
-    this.engine.world.gravity.scale = 0.00001
+    this.engine.world.gravity.scale = 0
     this.runner = Runner.create({})
     this.shapeList = []
     this.running = false
@@ -51,7 +51,14 @@ export default class App {
 
   public importFromSVG (svgStr: string) {
     const pathInfoList = svg.parseSvgGraphicsStr(svgStr)
-    const inRectList = svg.fitRect(pathInfoList, 0, 0, this.canvas.width, this.canvas.height)
+    const margin = FRAME_DEPTH
+    const inRectList = svg.fitRect(
+      pathInfoList,
+      margin,
+      margin,
+      this.canvas.width - margin * 2,
+      this.canvas.height - margin * 2
+    )
     inRectList.forEach((info) => {
       const shape = createShape(info)
       this.shapeList.push(shape)

@@ -174,10 +174,12 @@ export default class App {
 }
 
 function getSlashForce (body: MBody, slash: IVec2[]) {
+  const toSlash = geo.getUnit(geo.sub(slash[1], slash[0]))
   const pedal = geo.getPedal(body.position, slash)
-  const force = geo.getUnit(geo.sub(body.position, pedal))
-  const power = 2 / Math.max(body.mass, 1)
-  return geo.multi(force, power)
+  const toCross = geo.getUnit(geo.sub(body.position, pedal))
+  const force = geo.add(toCross, geo.multi(toSlash, 0.3))
+  const power = 1 / Math.max(body.mass, 1)
+  return geo.multi(geo.getUnit(force), power)
 }
 
 function createShape (path: ISvgPath): IBodyShape {
@@ -223,5 +225,5 @@ function getViewVertices (shape: IBodyShape): IVec2[] {
 
 function expandLine (a: IVec2, b: IVec2): IVec2[] {
   const v = geo.multi(geo.getUnit(geo.sub(b, a)), 4000)
-  return [geo.add(a, v), geo.sub(a, v)]
+  return [geo.sub(a, v), geo.add(a, v)]
 }

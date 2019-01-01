@@ -1,4 +1,4 @@
-import { Bodies, Body as MBody, IEventCollision, Engine, Events, Runner, Vector, Vertices, World } from 'matter-js'
+import { Bodies, Body as MBody, Engine, Events, IEventCollision, Runner, Vector, Vertices, World } from 'matter-js'
 import { ISvgPath, ISvgStyle, IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
@@ -149,9 +149,13 @@ export default class App {
   private findShape (body: MBody): IBodyShape | null {
     let target: IBodyShape | null = null
     this.shapeList.some((shape: IBodyShape) => {
-      if (shape.body.id === body.id) {
-        target = shape
-      }
+      // 分割bodyも検索対象
+      shape.body.parts.some((p) => {
+        if (p.id === body.id) {
+          target = shape
+        }
+        return !!target
+      })
       return !!target
     })
     return target
@@ -187,15 +191,22 @@ export default class App {
         // 変化なし
         nextShapeList.push(shape)
       } else {
-        // 分割前を削除
-        World.remove(this.engine.world, shape.body)
         // 分割後shape生成
+        const splitedShapeList: IBodyShape[] = []
         splited.forEach((path) => {
           // 小さすぎるものは除外
           if (geo.getArea(path) < 1) return
           const s = createShape({ d: path, style: shape.style })
-          // FIXME なぜかbodyが作られない場合がある
+          // 不適bodyは無視
           if (!s.body) return
+          splitedShapeList.push(s)
+        })
+
+        if (splitedShapeList.length !== splited.length) return
+
+        // 分割前を削除して分割後を追加
+        World.remove(this.engine.world, shape.body)
+        splitedShapeList.forEach((s) => {
           // スラッシュ反動付与
           MBody.setVelocity(s.body, geo.add(shape.body.velocity, getSlashForce(s.body, line)))
           World.add(this.engine.world, [s.body])
@@ -213,7 +224,7 @@ function getSlashForce (body: MBody, slash: IVec2[]) {
   const pedal = geo.getPedal(body.position, slash)
   const toCross = geo.getUnit(geo.sub(body.position, pedal))
   const force = geo.add(toCross, geo.multi(toSlash, 0.3))
-  const power = 1 / Math.max(body.mass, 1)
+  const power = 1 / Math.max(Math.min(body.mass, 5), 1)
   return geo.multi(geo.getUnit(force), power)
 }
 
@@ -227,7 +238,12 @@ function createShape (path: ISvgPath): IBodyShape {
   )
   return {
     body,
-    style: { ...path.style, lineJoin: 'bevel' },
+    style: {
+      ...path.style,
+      fill: true,
+      lineJoin: 'bevel',
+      stroke: true
+    },
     vertices: path.d.map((p) => ({ x: p.x - center.x, y: p.y - center.y }))
   }
 }
@@ -277,6 +293,7 @@ function mergeShape (a: IBodyShape, b: IBodyShape): IBodyShape | null {
       indexB = ib
       const segB = [vb, verticesB[(ib + 1) % verticesB.length]]
       isLap = isSegOverlapType(segA, segB)
+      if (isLap) console.log(segA, segB)
       return isLap
     })
     return isLap
@@ -286,7 +303,8 @@ function mergeShape (a: IBodyShape, b: IBodyShape): IBodyShape | null {
 
   const shiftedA = shiftArray(verticesA, indexA + 1)
   const shiftedB = shiftArray(verticesB, indexB + 1)
-  let polygon: IVec2[] = geo.omitSamePoint([...shiftedA, ...shiftedB])
+  console.log(shiftedA, shiftedB)
+  const polygon: IVec2[] = geo.omitSamePoint([...shiftedA, ...shiftedB])
   return createShape({
     d: polygon,
     style: a.style
@@ -308,11 +326,11 @@ function isSegOverlapType (a: IVec2[], b: IVec2[]): boolean {
   const na = geo.getNorm(va)
   const nb = geo.getNorm(vb)
 
-  if (na * nb < 1) return false
+  if (na < 5 || nb < 5) return false
+  if (na / nb > 3 || nb / na > 3) return false
 
-  const isParallel = Math.abs(geo.getCross(va, vb)) / na / nb < Math.cos(Math.PI / 180 * threshold)
+  const isParallel = Math.abs(geo.getCross(va, vb)) / na / nb < Math.cos(Math.PI / 180 * 5)
   if (!isParallel) return false
-
 
   const isOpposite = geo.getInner(va, vb) < 0
   if (!isOpposite) return false

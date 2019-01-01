@@ -1,5 +1,4 @@
-
-import { Bodies, Body as MBody, Engine, Events, Runner, Vector, Vertices, World } from 'matter-js'
+import { Bodies, Body as MBody, IEventCollision, Engine, Events, Runner, Vector, Vertices, World } from 'matter-js'
 import { ISvgPath, ISvgStyle, IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
@@ -128,6 +127,34 @@ export default class App {
     }
 
     Events.on(this.engine, 'afterUpdate', () => this.afterUpdate())
+    Events.on(this.engine, 'collisionActive', (e) => this.collisionActive(e))
+  }
+
+  private collisionActive (e: IEventCollision<Engine>) {
+    e.pairs.forEach((pair) => {
+      const shapeA = this.findShape(pair.bodyA)
+      const shapeB = this.findShape(pair.bodyB)
+      if (!shapeA || !shapeB) return
+      const merged = mergeShape(shapeA, shapeB)
+      if (!merged || !merged.body) return
+      World.remove(this.engine.world, shapeA.body)
+      World.remove(this.engine.world, shapeB.body)
+      this.shapeList.splice(this.shapeList.indexOf(shapeA), 1)
+      this.shapeList.splice(this.shapeList.indexOf(shapeB), 1)
+      World.add(this.engine.world, [merged.body])
+      this.shapeList.push(merged)
+    })
+  }
+
+  private findShape (body: MBody): IBodyShape | null {
+    let target: IBodyShape | null = null
+    this.shapeList.some((shape: IBodyShape) => {
+      if (shape.body.id === body.id) {
+        target = shape
+      }
+      return !!target
+    })
+    return target
   }
 
   private afterUpdate () {
@@ -162,16 +189,17 @@ export default class App {
       } else {
         // 分割前を削除
         World.remove(this.engine.world, shape.body)
-        // 分割後を追加
+        // 分割後shape生成
         splited.forEach((path) => {
           // 小さすぎるものは除外
           if (geo.getArea(path) < 1) return
           const s = createShape({ d: path, style: shape.style })
           // FIXME なぜかbodyが作られない場合がある
           if (!s.body) return
+          // スラッシュ反動付与
           MBody.setVelocity(s.body, geo.add(shape.body.velocity, getSlashForce(s.body, line)))
-          nextShapeList.push(s)
           World.add(this.engine.world, [s.body])
+          nextShapeList.push(s)
         })
       }
     })
@@ -233,4 +261,86 @@ function getViewVertices (shape: IBodyShape): IVec2[] {
 function expandLine (a: IVec2, b: IVec2): IVec2[] {
   const v = geo.multi(geo.getUnit(geo.sub(b, a)), 4000)
   return [geo.sub(a, v), geo.add(a, v)]
+}
+
+function mergeShape (a: IBodyShape, b: IBodyShape): IBodyShape | null {
+  const verticesA = geo.convertLoopwise(getViewVertices(a))
+  const verticesB = geo.convertLoopwise(getViewVertices(b))
+
+  let isLap = false
+  let indexA = 0
+  let indexB = 0
+  verticesA.some((va, ia) => {
+    indexA = ia
+    const segA = [va, verticesA[(ia + 1) % verticesA.length]]
+    verticesB.some((vb, ib) => {
+      indexB = ib
+      const segB = [vb, verticesB[(ib + 1) % verticesB.length]]
+      isLap = isSegOverlapType(segA, segB)
+      return isLap
+    })
+    return isLap
+  })
+
+  if (!isLap) return null
+
+  const shiftedA = shiftArray(verticesA, indexA + 1)
+  const shiftedB = shiftArray(verticesB, indexB + 1)
+  let polygon: IVec2[] = geo.omitSamePoint([...shiftedA, ...shiftedB])
+  return createShape({
+    d: polygon,
+    style: a.style
+  })
+}
+
+function shiftArray (array: any[], start: number): any[] {
+  const ret: any[] = []
+  for (let i = 0; i < array.length; i++) {
+    ret.push(array[(start + i) % array.length])
+  }
+  return ret
+}
+
+function isSegOverlapType (a: IVec2[], b: IVec2[]): boolean {
+  const threshold = 50
+  const va = geo.sub(a[0], a[1])
+  const vb = geo.sub(b[0], b[1])
+  const na = geo.getNorm(va)
+  const nb = geo.getNorm(vb)
+
+  if (na * nb < 1) return false
+
+  const isParallel = Math.abs(geo.getCross(va, vb)) / na / nb < Math.cos(Math.PI / 180 * threshold)
+  if (!isParallel) return false
+
+
+  const isOpposite = geo.getInner(va, vb) < 0
+  if (!isOpposite) return false
+
+  if (geo.getDistance(a[0], geo.getPedal(a[0], b)) < threshold) {
+    const s = geo.getDistance(b[0], a[0])
+    const t = geo.getDistance(a[0], b[1])
+    const u = geo.getDistance(b[0], b[1])
+    if (s + t - u < threshold) return true
+  }
+  if (geo.getDistance(a[1], geo.getPedal(a[1], b)) < threshold) {
+    const s = geo.getDistance(b[0], a[1])
+    const t = geo.getDistance(a[1], b[1])
+    const u = geo.getDistance(b[0], b[1])
+    if (s + t - u < threshold) return true
+  }
+  if (geo.getDistance(b[0], geo.getPedal(b[0], a)) < threshold) {
+    const s = geo.getDistance(a[0], b[0])
+    const t = geo.getDistance(b[0], a[1])
+    const u = geo.getDistance(a[0], a[1])
+    if (s + t - u < threshold) return true
+  }
+  if (geo.getDistance(b[1], geo.getPedal(b[1], a)) < threshold) {
+    const s = geo.getDistance(a[0], b[1])
+    const t = geo.getDistance(b[1], a[1])
+    const u = geo.getDistance(a[0], a[1])
+    if (s + t - u < threshold) return true
+  }
+
+  return false
 }

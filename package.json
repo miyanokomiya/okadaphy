@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@types/matter-js": "^0.10.2",
+    "lit-html": "^0.14.0",
     "matter-js": "^0.14.2",
     "okageo": "^1.0.0",
     "poly-decomp": "^0.3.0"

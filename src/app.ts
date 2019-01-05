@@ -1,4 +1,4 @@
-import { Bodies, Body as MBody, Engine, Events, Runner, Vector, Vertices, World } from 'matter-js'
+import { Bodies, Body as MBody, Engine, Events, IEventCollision, Runner, Vector, Vertices, World } from 'matter-js'
 import { ISvgPath, ISvgStyle, IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
@@ -46,6 +46,38 @@ export default class App {
     this.draw()
     this.stop()
     this.initEventListener()
+  }
+
+  public importFromDefault () {
+    const pathInfoList = [{
+      d: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }],
+      style: {
+        fill: true,
+        fillGlobalAlpha: 1,
+        fillStyle: 'gray',
+        lineCap: 'butt',
+        lineDash: [],
+        lineJoin: 'bevel',
+        lineWidth: 1,
+        stroke: true,
+        strokeGlobalAlpha: 1,
+        strokeStyle: 'yellow'
+      }
+    }]
+    const margin = FRAME_DEPTH * 14
+    const inRectList = svg.fitRect(
+      pathInfoList,
+      margin,
+      margin,
+      this.canvas.width - margin * 2,
+      this.canvas.height - margin * 2
+    )
+    inRectList.forEach((info) => {
+      const shape = createShape(info)
+      this.shapeList.push(shape)
+      World.add(this.engine.world, [shape.body])
+    })
+    this.draw()
   }
 
   public importFromSVG (svgStr: string) {
@@ -128,6 +160,59 @@ export default class App {
     }
 
     Events.on(this.engine, 'afterUpdate', () => this.afterUpdate())
+    Events.on(this.engine, 'collisionActive', (e) => this.collisionActive(e))
+  }
+
+  private collisionActive (e: IEventCollision<Engine>) {
+    const pairs = e.pairs
+    const index = Math.floor(Math.random() * pairs.length)
+    const pair = pairs[index]
+    const shapeA = this.findShape(pair.bodyA.id)
+    const shapeB = this.findShape(pair.bodyB.id)
+    if (!shapeA || !shapeB) return
+    const rate = shapeA.body.area / shapeB.body.area
+    if (0.6 < rate && rate < 1.4) {
+      const center = geo.getCenter(shapeA.body.position, shapeB.body.position)
+      const radius = Math.sqrt((shapeA.body.area + shapeA.body.area) / Math.PI) * 1.12
+      const count = Math.random() * 13 + 3
+      const points: IVec2[] = []
+      for (let i = 0; i < count; i++) {
+        const t = 2 * Math.PI / count * i
+        points.push({
+          x: center.x + radius * Math.cos(t),
+          y: center.y + radius * Math.sin(t)
+        })
+      }
+      const shape = createShape({
+        d: points,
+        style: shapeA.style
+      })
+      if (!shape.body) return
+
+      World.remove(this.engine.world, shapeA.body)
+      World.remove(this.engine.world, shapeB.body)
+      const randomRad = Math.random() * Math.PI * 2
+      MBody.applyForce(shape.body, shape.body.position, {
+        x: Math.cos(randomRad) * radius / 500,
+        y: Math.sin(randomRad) * radius / 500
+      })
+      World.add(this.engine.world, [shape.body])
+      this.shapeList.splice(this.shapeList.indexOf(shapeA), 1)
+      this.shapeList.splice(this.shapeList.indexOf(shapeB), 1)
+      this.shapeList.push(shape)
+    }
+  }
+
+  private findShape (id: number): IBodyShape | null {
+    let shape: IBodyShape | null = null
+    this.shapeList.some((s) => {
+      s.body.parts.some((part) => {
+        if (part.id === id) shape = s
+        return !!shape
+      })
+      return !!shape
+    })
+    return shape
   }
 
   private afterUpdate () {
@@ -194,7 +279,7 @@ function getSlashForce (body: MBody, slash: IVec2[]) {
   const pedal = geo.getPedal(body.position, slash)
   const toCross = geo.getUnit(geo.sub(body.position, pedal))
   const force = geo.add(toCross, geo.multi(toSlash, 0.3))
-  const power = 1 / Math.max(Math.min(body.mass, 5), 1)
+  const power = 3 / Math.max(Math.min(body.mass, 5), 1)
   return geo.multi(geo.getUnit(force), power)
 }
 
@@ -206,6 +291,10 @@ function createShape (path: ISvgPath): IBodyShape {
     center.y,
     [polyList]
   )
+  if (body) {
+    body.friction = 0
+    body.frictionAir = 0
+  }
   const vertices = path.d.map((p) => ({ x: p.x - body.position.x, y: p.y - body.position.y }))
   return {
     body,

@@ -1,22 +1,13 @@
 import { Bodies, Body as MBody, Engine, Events, IEventCollision, Runner, Vector, Vertices, World } from 'matter-js'
-import { ISvgPath, ISvgStyle, IVec2 } from 'okageo'
+import { ISvgPath, IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
+import { IBodyShape, ISlash } from '../types/index'
 import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
+import { createShape, getSlashForce, getViewVertices, mergeShape, splitShape } from './shape'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 (window as any).decomp = require('poly-decomp')
-
-interface IBodyShape {
-  body: MBody
-  style: ISvgStyle
-  vertices: IVec2[]
-}
-
-interface ISlash {
-  line: IVec2[]
-  time: number
-}
 
 export default class App {
   private engine: Engine
@@ -170,37 +161,17 @@ export default class App {
     const shapeA = this.findShape(pair.bodyA.id)
     const shapeB = this.findShape(pair.bodyB.id)
     if (!shapeA || !shapeB) return
-    const rate = shapeA.body.area / shapeB.body.area
-    if (0.6 < rate && rate < 1.4) {
-      const center = geo.getCenter(shapeA.body.position, shapeB.body.position)
-      const radius = Math.sqrt((shapeA.body.area + shapeA.body.area) / Math.PI) * 1.12
-      const count = Math.random() * 13 + 3
-      const points: IVec2[] = []
-      for (let i = 0; i < count; i++) {
-        const t = 2 * Math.PI / count * i
-        points.push({
-          x: center.x + radius * Math.cos(t),
-          y: center.y + radius * Math.sin(t)
-        })
-      }
-      const shape = createShape({
-        d: points,
-        style: shapeA.style
-      })
-      if (!shape.body) return
 
-      World.remove(this.engine.world, shapeA.body)
-      World.remove(this.engine.world, shapeB.body)
-      const randomRad = Math.random() * Math.PI * 2
-      MBody.applyForce(shape.body, shape.body.position, {
-        x: Math.cos(randomRad) * radius / 500,
-        y: Math.sin(randomRad) * radius / 500
-      })
-      World.add(this.engine.world, [shape.body])
-      this.shapeList.splice(this.shapeList.indexOf(shapeA), 1)
-      this.shapeList.splice(this.shapeList.indexOf(shapeB), 1)
-      this.shapeList.push(shape)
-    }
+    const mergedShape: IBodyShape | null = mergeShape(shapeA, shapeB)
+    if (!mergedShape) return
+
+    World.remove(this.engine.world, shapeA.body)
+    World.remove(this.engine.world, shapeB.body)
+    this.shapeList.splice(this.shapeList.indexOf(shapeA), 1)
+    this.shapeList.splice(this.shapeList.indexOf(shapeB), 1)
+    World.add(this.engine.world, [mergedShape.body])
+    this.shapeList.push(mergedShape)
+
   }
 
   private findShape (id: number): IBodyShape | null {
@@ -239,72 +210,22 @@ export default class App {
     this.slashList.push({ line, time: 0 })
     const nextShapeList: IBodyShape[] = []
     this.shapeList.forEach((shape) => {
-      const viewVertices = getViewVertices(shape)
-      const splited = geo.splitPolyByLine(viewVertices, line)
-      if (splited.length < 2) {
-        // 変化なし
+      const splitedShapeList = splitShape(shape, line)
+      if (!splitedShapeList) {
         nextShapeList.push(shape)
-      } else {
-        // 分割後shape生成
-        const splitedShapeList: IBodyShape[] = []
-        splited.forEach((path) => {
-          // 小さすぎるものは除外
-          if (geo.getArea(path) < 1) return
-          const s = createShape({ d: path, style: shape.style })
-          // 不適bodyは無視
-          if (!s.body) return
-          splitedShapeList.push(s)
-        })
-
-        if (splitedShapeList.length !== splited.length) return
-
-        // 分割前を削除して分割後を追加
-        World.remove(this.engine.world, shape.body)
-        splitedShapeList.forEach((s) => {
-          // スラッシュ反動付与
-          MBody.setVelocity(s.body, geo.add(shape.body.velocity, getSlashForce(s.body, line)))
-          World.add(this.engine.world, [s.body])
-          nextShapeList.push(s)
-        })
+        return
       }
+
+      // 分割前を削除して分割後を追加
+      World.remove(this.engine.world, shape.body)
+      splitedShapeList.forEach((s) => {
+        World.add(this.engine.world, [s.body])
+        nextShapeList.push(s)
+      })
     })
 
     this.shapeList = nextShapeList
     this.draw()
-  }
-}
-
-function getSlashForce (body: MBody, slash: IVec2[]) {
-  const toSlash = geo.getUnit(geo.sub(slash[1], slash[0]))
-  const pedal = geo.getPedal(body.position, slash)
-  const toCross = geo.getUnit(geo.sub(body.position, pedal))
-  const force = geo.add(toCross, geo.multi(toSlash, 0.3))
-  const power = 3 / Math.max(Math.min(body.mass, 5), 1)
-  return geo.multi(geo.getUnit(force), power)
-}
-
-function createShape (path: ISvgPath): IBodyShape {
-  const polyList = path.d.map((p) => Vector.create(p.x, p.y))
-  const center = Vertices.centre(polyList)
-  const body = Bodies.fromVertices(
-    center.x,
-    center.y,
-    [polyList]
-  )
-  if (body) {
-    body.friction = 0
-    body.frictionAir = 0
-  }
-  const vertices = path.d.map((p) => ({ x: p.x - body.position.x, y: p.y - body.position.y }))
-  return {
-    body,
-    style: {
-      ...path.style,
-      fill: true,
-      lineJoin: 'bevel',
-      stroke: true
-    },
-    vertices
   }
 }
 
@@ -325,13 +246,6 @@ function getCursorPoint (e: MouseEvent | TouchEvent): IVec2 {
       y : e.pageY - positionY
     }
   }
-}
-
-function getViewVertices (shape: IBodyShape): IVec2[] {
-  return shape.vertices.map((p) => {
-    const rotated = geo.rotate(p, shape.body.angle)
-    return geo.add(rotated, shape.body.position)
-  })
 }
 
 function expandLine (a: IVec2, b: IVec2): IVec2[] {

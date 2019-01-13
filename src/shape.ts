@@ -8,8 +8,11 @@ export function mergeShape (shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape 
   if (rate < 0.6 || 1.4 < rate) return null
 
   const center = geo.getCenter(shapeA.body.position, shapeB.body.position)
-  const radius = Math.sqrt((shapeA.body.area + shapeA.body.area) / Math.PI) * 1.12
   const count = Math.random() * 13 + 3
+  const radius = geo.getRegularPolygonRadius(
+    shapeA.body.area + shapeA.body.area,
+    count
+  )
   const points: IVec2[] = []
   for (let i = 0; i < count; i++) {
     const t = 2 * Math.PI / count * i

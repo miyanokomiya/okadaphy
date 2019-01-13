@@ -63,11 +63,7 @@ export default class App {
       this.canvas.width - margin * 2,
       this.canvas.height - margin * 2
     )
-    inRectList.forEach((info) => {
-      const shape = createShape(info)
-      this.shapeList.push(shape)
-      World.add(this.engine.world, [shape.body])
-    })
+    inRectList.forEach((info) => this.addShape(createShape(info)))
     this.draw()
   }
 
@@ -81,11 +77,7 @@ export default class App {
       this.canvas.width - margin * 2,
       this.canvas.height - margin * 2
     )
-    inRectList.forEach((info) => {
-      const shape = createShape(info)
-      this.shapeList.push(shape)
-      World.add(this.engine.world, [shape.body])
-    })
+    inRectList.forEach((info) => this.addShape(createShape(info)))
     this.draw()
   }
 
@@ -154,6 +146,16 @@ export default class App {
     Events.on(this.engine, 'collisionActive', (e) => this.collisionActive(e))
   }
 
+  private addShape (shape: IBodyShape): void {
+    World.add(this.engine.world, [shape.body])
+    this.shapeList.push(shape)
+  }
+
+  private removeShape (shape: IBodyShape): void {
+    World.remove(this.engine.world, shape.body)
+    this.shapeList.splice(this.shapeList.indexOf(shape), 1)
+  }
+
   private collisionActive (e: IEventCollision<Engine>) {
     const pairs = e.pairs
     const index = Math.floor(Math.random() * pairs.length)
@@ -165,13 +167,9 @@ export default class App {
     const mergedShape: IBodyShape | null = mergeShape(shapeA, shapeB)
     if (!mergedShape) return
 
-    World.remove(this.engine.world, shapeA.body)
-    World.remove(this.engine.world, shapeB.body)
-    this.shapeList.splice(this.shapeList.indexOf(shapeA), 1)
-    this.shapeList.splice(this.shapeList.indexOf(shapeB), 1)
-    World.add(this.engine.world, [mergedShape.body])
-    this.shapeList.push(mergedShape)
-
+    this.removeShape(shapeA)
+    this.removeShape(shapeB)
+    this.addShape(mergedShape)
   }
 
   private findShape (id: number): IBodyShape | null {
@@ -208,23 +206,15 @@ export default class App {
 
   private slash (line: IVec2[]) {
     this.slashList.push({ line, time: 0 })
-    const nextShapeList: IBodyShape[] = []
-    this.shapeList.forEach((shape) => {
+    this.shapeList.concat().forEach((shape) => {
       const splitedShapeList = splitShape(shape, line)
-      if (!splitedShapeList) {
-        nextShapeList.push(shape)
-        return
-      }
+      if (!splitedShapeList) return
 
       // 分割前を削除して分割後を追加
-      World.remove(this.engine.world, shape.body)
-      splitedShapeList.forEach((s) => {
-        World.add(this.engine.world, [s.body])
-        nextShapeList.push(s)
-      })
+      this.removeShape(shape)
+      splitedShapeList.forEach((s) => this.addShape(s))
     })
 
-    this.shapeList = nextShapeList
     this.draw()
   }
 }

@@ -163,7 +163,7 @@ export default class App {
     e.pairs
       .filter((pair) => pair.timeUpdated - pair.timeCreated > 3000)
       .forEach((pair) => {
-        if (Math.random() < 0.9995) return
+        if (Math.random() < 0.990) return
 
         const shapeA = this.findShape(pair.bodyA.id)
         const shapeB = this.findShape(pair.bodyB.id)
@@ -193,9 +193,24 @@ export default class App {
 
   private afterUpdate () {
     this.pullCenter()
+    this.pullEachOther()
     this.slashList.forEach((slash) => slash.time++)
     this.slashList = this.slashList.filter((slash) => slash.time < 60)
     this.draw()
+  }
+
+  private pullEachOther () {
+    this.shapeList.forEach((base) => {
+      this.shapeList.forEach((shape) => {
+        if (base.body.id === shape.body.id) return
+
+        const vec = geo.sub(base.body.position, shape.body.position)
+        const d = geo.getNorm(vec)
+        if (d < 1) return
+        const force = geo.multi(vec, 0.00001 * base.body.mass / Math.pow(d, 2))
+        MBody.applyForce(shape.body, shape.body.position, force)
+      })
+    })
   }
 
   private pullCenter () {
@@ -204,7 +219,7 @@ export default class App {
       const vec = geo.sub(center, shape.body.position)
       const d = geo.getNorm(vec)
       if (d < 1) return
-      const force = geo.multi(vec, 0.00001 / d)
+      const force = geo.multi(vec, 0.00001 / Math.pow(d, 2))
       MBody.applyForce(shape.body, shape.body.position, force)
     })
   }

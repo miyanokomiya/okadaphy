@@ -27,11 +27,10 @@ export function mergeShape (shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape 
   })
   if (!shape.body) return null
 
-  const randomRad = Math.random() * Math.PI * 2
-  MBody.applyForce(shape.body, shape.body.position, {
-    x: Math.cos(randomRad) * radius / 500,
-    y: Math.sin(randomRad) * radius / 500
-  })
+  MBody.applyForce(shape.body, shape.body.position, geo.add(
+    shapeA.body.force,
+    shapeB.body.force
+  ))
   return shape
 }
 

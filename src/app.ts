@@ -1,10 +1,10 @@
-import { Bodies, Body as MBody, Engine, Events, IEventCollision, Runner, Vector, Vertices, World } from 'matter-js'
-import { ISvgPath, IVec2 } from 'okageo'
+import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
+import { IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
 import { IBodyShape, ISlash } from '../types/index'
 import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
-import { createShape, getSlashForce, getViewVertices, mergeShape, splitShape } from './shape'
+import { createShape, mergeShape, splitShape } from './shape'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 (window as any).decomp = require('poly-decomp')
@@ -64,6 +64,9 @@ export default class App {
       this.canvas.height - margin * 2
     )
     inRectList.forEach((info) => this.addShape(createShape(info)))
+    this.shapeList.forEach((shape) => {
+      MBody.setAngularVelocity(shape.body, 0.01)
+    })
     this.draw()
   }
 
@@ -157,24 +160,28 @@ export default class App {
   }
 
   private collisionActive (e: IEventCollision<Engine>) {
-    const pairs = e.pairs
-    const index = Math.floor(Math.random() * pairs.length)
-    const pair = pairs[index]
-    const shapeA = this.findShape(pair.bodyA.id)
-    const shapeB = this.findShape(pair.bodyB.id)
-    if (!shapeA || !shapeB) return
+    e.pairs
+      .filter((pair) => pair.timeUpdated - pair.timeCreated > 3000)
+      .forEach((pair) => {
+        if (Math.random() < 0.9995) return
 
-    const mergedShape: IBodyShape | null = mergeShape(shapeA, shapeB)
-    if (!mergedShape) return
+        const shapeA = this.findShape(pair.bodyA.id)
+        const shapeB = this.findShape(pair.bodyB.id)
+        if (!shapeA || !shapeB) return
 
-    this.removeShape(shapeA)
-    this.removeShape(shapeB)
-    this.addShape(mergedShape)
+        const mergedShape: IBodyShape | null = mergeShape(shapeA, shapeB)
+        if (!mergedShape) return
+
+        this.removeShape(shapeA)
+        this.removeShape(shapeB)
+        this.addShape(mergedShape)
+      })
   }
 
   private findShape (id: number): IBodyShape | null {
     let shape: IBodyShape | null = null
     this.shapeList.some((s) => {
+      // partsとして抱えるbodyも検索対象とする
       s.body.parts.some((part) => {
         if (part.id === id) shape = s
         return !!shape
@@ -185,9 +192,21 @@ export default class App {
   }
 
   private afterUpdate () {
+    this.pullCenter()
     this.slashList.forEach((slash) => slash.time++)
     this.slashList = this.slashList.filter((slash) => slash.time < 60)
     this.draw()
+  }
+
+  private pullCenter () {
+    const center = { x: this.canvas.width / 2, y: this.canvas.height / 2 }
+    this.shapeList.forEach((shape) => {
+      const vec = geo.sub(center, shape.body.position)
+      const d = geo.getNorm(vec)
+      if (d < 1) return
+      const force = geo.multi(vec, 0.00001 / d)
+      MBody.applyForce(shape.body, shape.body.position, force)
+    })
   }
 
   private onCursorDown (e: MouseEvent | TouchEvent) {

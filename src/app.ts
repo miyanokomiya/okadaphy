@@ -1,35 +1,35 @@
+import { IBodyShape, ISlash } from '../types/index'
+import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
+import { createShape, mergeShape, splitShape } from './shape'
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
 import { IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
-import { IBodyShape, ISlash } from '../types/index'
-import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
-import { createShape, mergeShape, splitShape } from './shape'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 (window as any).decomp = require('poly-decomp')
 
 export default class App {
+  private canvas: HTMLCanvasElement
+  private clearEventListener: () => void
+  private ctx: CanvasRenderingContext2D
+  private cursorDownPoint: IVec2 | null
   private engine: Engine
   private runner: Runner
-  private canvas: HTMLCanvasElement
-  private ctx: CanvasRenderingContext2D
-  private shapeList: IBodyShape[]
   private running: boolean
-  private clearEventListener: () => void
-  private cursorDownPoint: IVec2 | null
+  private shapeList: IBodyShape[]
   private slashList: ISlash[]
 
   constructor (args: { canvas: HTMLCanvasElement }) {
     this.canvas = args.canvas
-    this.ctx = this.canvas.getContext('2d') as CanvasRenderingContext2D
+    this.clearEventListener = () => { return }
+    this.ctx = args.canvas.getContext('2d') as CanvasRenderingContext2D
+    this.cursorDownPoint = null
     this.engine = Engine.create()
     this.engine.world.gravity.scale = 0
     this.runner = Runner.create({})
-    this.shapeList = []
     this.running = false
-    this.clearEventListener = () => { return }
-    this.cursorDownPoint = null
+    this.shapeList = []
     this.slashList = []
 
     // 壁生成

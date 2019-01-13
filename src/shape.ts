@@ -1,7 +1,7 @@
+import { IBodyShape } from '../types/index'
 import { Bodies, Body as MBody, Vector, Vertices } from 'matter-js'
 import { ISvgPath, IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
-import { IBodyShape } from '../types/index'
 
 export function mergeShape (shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape | null {
   const rate = shapeA.body.area / shapeB.body.area

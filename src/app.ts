@@ -1,10 +1,10 @@
-import { IBodyShape, ISlash } from '../types/index'
-import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
-import { createShape, mergeShape, splitShape } from './shape'
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
 import { IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
+import { IBodyShape, ISlash } from '../types/index'
+import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
+import { createShape, mergeShape, splitShape } from './shape'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 (window as any).decomp = require('poly-decomp')

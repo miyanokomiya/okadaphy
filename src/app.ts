@@ -242,8 +242,8 @@ export default class App {
   }
 
   private afterUpdate () {
-    this.pullCenter()
-    this.pullEachOther()
+    // this.pullCenter()
+    // this.pullEachOther()
     this.slashList.forEach((slash) => slash.time++)
     this.slashList = this.slashList.filter((slash) => slash.time < 60)
     this.draw()

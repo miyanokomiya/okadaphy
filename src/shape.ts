@@ -78,7 +78,7 @@ export function getSlashForce (body: MBody, slash: IVec2[]) {
   const pedal = geo.getPedal(body.position, slash)
   const toCross = geo.getUnit(geo.sub(body.position, pedal))
   const force = geo.add(toCross, geo.multi(toSlash, 0.3))
-  const power = 3 / Math.max(Math.min(body.mass, 5), 1)
+  const power = 1 / Math.max(Math.min(body.mass, 5), 1)
   return geo.multi(geo.getUnit(force), power)
 }
 
@@ -142,7 +142,6 @@ export function splitShape (shape: IBodyShape, line: IVec2[]): IBodyShape[] | nu
     if (!s) return
     splitedShapeList.push(s)
   })
-  if (splitedShapeList.length !== groups.length) return null
 
   // スラッシュ反動付与
   splitedShapeList.forEach((s) => {

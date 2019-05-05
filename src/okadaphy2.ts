@@ -37,7 +37,7 @@ class OkadaPhy2 extends HTMLElement {
     const canvas = this.shadowRoot.getElementById('canvas')
     if (!canvas) return
     this.app = new App({ canvas: canvas as HTMLCanvasElement })
-    this.app.importFromString('岡田')
+    this.app.importFromString('複雑GUI会')
     this.app.run()
   }
 }

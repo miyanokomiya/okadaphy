@@ -23,6 +23,7 @@ export default class App {
   private running: boolean
   private shapeList: IBodyShape[]
   private slashList: ISlash[]
+  private font: any
 
   constructor (args: { canvas: HTMLCanvasElement }) {
     this.canvas = args.canvas
@@ -99,17 +100,13 @@ export default class App {
   }
 
   public importFromString (str: string) {
-    opentype.load('/NotoSansCJKjp-Medium.otf', (err, font) => {
-      if (!font || err) {
-        console.log('Font could not be loaded: ' + err)
-        return
-      }
+    this.loadFont().then(() => {
       const lines = str.split(/\n|\r\n/)
       const size = 72
       let pathList: IVec2[][] = []
       lines.forEach((line, i) => {
         const top = size * 1.1 * i
-        const fontPath = font.getPath(line, 0, top, size)
+        const fontPath = this.font.getPath(line, 0, top, size)
         pathList = pathList.concat(
           svg.parseOpenPath(fontPath).map((info) => geo.omitSamePoint(info.d)))
       })
@@ -151,6 +148,14 @@ export default class App {
     this.running = false
   }
 
+  public clear () {
+    Engine.clear(this.engine)
+    this.cursorDownPoint = null
+    this.shapeList.concat().forEach((s) => this.removeShape(s))
+    this.shapeList = []
+    this.slashList = []
+  }
+
   public dispose () {
     this.stop()
     Engine.clear(this.engine)
@@ -160,6 +165,20 @@ export default class App {
 
   public isRunning () {
     return this.running
+  }
+
+  private loadFont (): Promise<undefined> {
+    return new Promise((resolve, reject) => {
+      if (this.font) return resolve()
+
+      opentype.load('/NotoSansCJKjp-Medium.otf', (err, font) => {
+        if (!font || err) {
+          return reject(new Error('Font could not be loaded: ' + err))
+        }
+        this.font = font
+        return resolve()
+      })
+    })
   }
 
   private draw () {

@@ -35,12 +35,18 @@ export function mergeShape (shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape 
 }
 
 export function createShape (path: ISvgPath): IBodyShape | null {
-  const polyList = path.d.map((p) => Vector.create(p.x, p.y))
-  const center = Vertices.centre(polyList)
+  // 同一座標を取り除いておく
+  const d = geo.omitSamePoint(path.d)
+  const included = (path.included || []).map((inner) => {
+    return geo.omitSamePoint(inner)
+  })
+
+  const poly = d.map((p) => Vector.create(p.x, p.y))
+  const center = Vertices.centre(poly)
   const body = Bodies.fromVertices(
     center.x,
     center.y,
-    [polyList]
+    [poly]
   )
 
   if (!body) return null
@@ -49,11 +55,11 @@ export function createShape (path: ISvgPath): IBodyShape | null {
     body.friction = 0
     body.frictionAir = 0
   }
-  const vertices = path.d.map((p) => ({ x: p.x - body.position.x, y: p.y - body.position.y }))
+  const vertices = d.map((p) => ({ x: p.x - body.position.x, y: p.y - body.position.y }))
   return {
     body,
-    included: (path.included || []).map((poly: IVec2[]) => {
-      return poly.map((p) => (
+    included: included.map((inner: IVec2[]) => {
+      return inner.map((p) => (
         { x: p.x - body.position.x, y: p.y - body.position.y }
       ))
     }),
@@ -124,8 +130,6 @@ export function splitShape (shape: IBodyShape, line: IVec2[]): IBodyShape[] | nu
 
   // 包含関係で再度グルーピング
   const groups = geo.getIncludedPolygonGroups(splitedAfterNot)
-  // console.log(splitedAfterNot)
-  // console.log(groups)
 
   // 分割後shape生成
   const splitedShapeList: IBodyShape[] = []

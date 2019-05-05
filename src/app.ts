@@ -106,7 +106,7 @@ export default class App {
       }
       const fontPath = font.getPath(str, 0, 150, 72)
       const groups = geo.getIncludedPolygonGroups(
-        svg.parseOpenPath(fontPath).map((info) => info.d))
+        svg.parseOpenPath(fontPath).map((info) => geo.omitSamePoint(info.d)))
       const style = {
         ...svg.createStyle(),
         fill: true,
@@ -116,7 +116,7 @@ export default class App {
         const [d, ...included] = group
         return { d, included, style }
       })
-      const margin = FRAME_DEPTH + 100
+      const margin = FRAME_DEPTH + 30
       svg.fitRect(
         pathInfoList,
         margin,

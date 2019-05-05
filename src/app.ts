@@ -104,9 +104,17 @@ export default class App {
         console.log('Font could not be loaded: ' + err)
         return
       }
-      const fontPath = font.getPath(str, 0, 150, 72)
-      const groups = geo.getIncludedPolygonGroups(
-        svg.parseOpenPath(fontPath).map((info) => geo.omitSamePoint(info.d)))
+      const lines = str.split(/\n|\r\n/)
+      const size = 72
+      let pathList: IVec2[][] = []
+      lines.forEach((line, i) => {
+        const top = size * 1.1 * i
+        const fontPath = font.getPath(line, 0, top, size)
+        pathList = pathList.concat(
+          svg.parseOpenPath(fontPath).map((info) => geo.omitSamePoint(info.d)))
+      })
+
+      const groups = geo.getIncludedPolygonGroups(pathList)
       const style = {
         ...svg.createStyle(),
         fill: true,

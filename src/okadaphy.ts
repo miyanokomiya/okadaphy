@@ -9,6 +9,7 @@ class OkadaPhy extends HTMLElement {
   private app: App | null
   private width: number
   private height: number
+  private text: string
 
   constructor () {
     super()
@@ -16,23 +17,26 @@ class OkadaPhy extends HTMLElement {
     this.app = null
     this.width = 300
     this.height = 300
+    this.text = '岡田を\n切る技術'
   }
 
   public html () {
     return html`
       <div>
-        <input
-          type="file" accept="image/svg"
-          @change="${(e: Event) => this.importFromSVG(e)}"
-        />
-        <button @click="${() => this.toggleRun()}">
-          ${this.isRunning() ? 'stop' : 'run'}
-        </button>
-      </div>
-      <canvas id="canvas"
-        width="${this.width}" height="${this.height}"
-        style="border: 1px solid gray;"
-      />`
+        <canvas id="canvas"
+          width="${this.width}" height="${this.height}"
+          style="border: 1px solid gray;"
+        ></canvas>
+        <textarea
+          cols="30"
+          rows="3"
+          @input=${(e: any) => { this. text = e.target.value }}
+        >${this.text}</textarea>
+        <button
+          type="button"
+          @click="${() => this.importText()}"
+        >RUN</button>
+      </div>`
   }
 
   public connectedCallback () {
@@ -41,40 +45,18 @@ class OkadaPhy extends HTMLElement {
     if (width) this.width = parseInt(width, 10)
     if (height) this.height = parseInt(height, 10)
     render(this.html(), this)
+    if (!this.shadowRoot) return
+    const canvas = this.shadowRoot.getElementById('canvas')
+    if (!canvas) return
+    this.app = new App({ canvas: canvas as HTMLCanvasElement })
+    this.importText()
   }
 
-  private isRunning () {
+  private importText () {
     if (!this.app) return
-    return this.app.isRunning()
-  }
-
-  private toggleRun () {
-    if (!this.app) return
-    if (this.app.isRunning()) {
-      this.app.stop()
-    } else {
-      this.app.run()
-    }
-    render(this.html(), this)
-  }
-
-  private importFromSVG (e: Event) {
-    const file = (e.target as HTMLInputElement).files
-    if (!file || file.length === 0) return
-
-    const reader = new FileReader()
-    reader.readAsText(file[0])
-    reader.onload = () => {
-      if (!this.shadowRoot) return
-      if (this.app) this.app.dispose()
-      const canvas = this.shadowRoot.getElementById('canvas')
-      if (!canvas) return
-      this.app = new App({ canvas: canvas as HTMLCanvasElement })
-      this.app.importFromSVG(reader.result as string)
-      this.app.run()
-      render(this.html(), this)
-    }
-
+    this.app.clear()
+    this.app.importFromString(this.text)
+    this.app.run()
   }
 }
 customElements.define('okada-phy', OkadaPhy)

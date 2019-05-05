@@ -25,7 +25,7 @@ export function mergeShape (shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape 
     d: points,
     style: shapeA.style
   })
-  if (!shape.body) return null
+  if (!shape) return null
 
   MBody.applyForce(shape.body, shape.body.position, geo.add(
     shapeA.body.force,
@@ -34,7 +34,7 @@ export function mergeShape (shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape 
   return shape
 }
 
-export function createShape (path: ISvgPath): IBodyShape {
+export function createShape (path: ISvgPath): IBodyShape | null {
   const polyList = path.d.map((p) => Vector.create(p.x, p.y))
   const center = Vertices.centre(polyList)
   const body = Bodies.fromVertices(
@@ -42,6 +42,9 @@ export function createShape (path: ISvgPath): IBodyShape {
     center.y,
     [polyList]
   )
+
+  if (!body) return null
+
   if (body) {
     body.friction = 0
     body.frictionAir = 0
@@ -49,6 +52,11 @@ export function createShape (path: ISvgPath): IBodyShape {
   const vertices = path.d.map((p) => ({ x: p.x - body.position.x, y: p.y - body.position.y }))
   return {
     body,
+    included: (path.included || []).map((poly: IVec2[]) => {
+      return poly.map((p) => (
+        { x: p.x - body.position.x, y: p.y - body.position.y }
+      ))
+    }),
     style: {
       ...path.style,
       fill: true,
@@ -69,21 +77,68 @@ export function getSlashForce (body: MBody, slash: IVec2[]) {
 }
 
 export function splitShape (shape: IBodyShape, line: IVec2[]): IBodyShape[] | null {
+  // 包含ポリゴンと共に全て分割
   const viewVertices = getViewVertices(shape)
-  const splited = geo.splitPolyByLine(viewVertices, line)
+  const viewIncluded = getViewIncluded(shape)
+
+  let splited = geo.splitPolyByLine(viewVertices, line)
   if (splited.length < 2) return null
+
+  // 本体と回転方向が一致しているかで分類
+  const rootLoopwise = geo.getLoopwise(viewVertices)
+  const sameLoopwiseList: IVec2[][] = []
+  const oppositeLoopwiseList: IVec2[][] = []
+  viewIncluded.forEach((s) => {
+    if (geo.getLoopwise(s) === rootLoopwise) {
+      sameLoopwiseList.push(s)
+    } else {
+      oppositeLoopwiseList.push(s)
+    }
+  })
+
+  // 本体と同回転のものはそのまま分割
+  sameLoopwiseList.forEach((poly) => {
+    const sp = geo.splitPolyByLine(poly, line)
+    splited = [...splited, ...(sp.length > 0 ? sp : [poly])]
+  })
+
+  // 本体と逆回転のものは特殊処理
+  const notPolyList: IVec2[][] = []
+  oppositeLoopwiseList.forEach((poly) => {
+    const sp = geo.splitPolyByLine(poly, line)
+    if (sp.length > 0) {
+      // 分割されたらブーリアン差をとるために集める
+      notPolyList.push(poly)
+    } else {
+      // 分割なしならそのまま
+      splited.push(poly)
+    }
+  })
+
+  // 切断されたくり抜き領域を差し引いたポリゴンを生成
+  const splitedAfterNot = splited.map((s) => {
+    return notPolyList.reduce((p, c) => {
+      return geo.getPolygonNotPolygon(p, c)
+    }, s)
+  })
+
+  // 包含関係で再度グルーピング
+  const groups = geo.getIncludedPolygonGroups(splitedAfterNot)
+  // console.log(splitedAfterNot)
+  // console.log(groups)
 
   // 分割後shape生成
   const splitedShapeList: IBodyShape[] = []
-  splited.forEach((path) => {
+  groups.forEach((group) => {
+    const [path, ...included] = group
     // 小さすぎるものは除外
     if (geo.getArea(path) < 1) return
-    const s = createShape({ d: path, style: shape.style })
+    const s = createShape({ d: path, included, style: shape.style })
     // 不適bodyは無視
-    if (!s.body) return
+    if (!s) return
     splitedShapeList.push(s)
   })
-  if (splitedShapeList.length !== splited.length) return null
+  if (splitedShapeList.length !== groups.length) return null
 
   // スラッシュ反動付与
   splitedShapeList.forEach((s) => {
@@ -102,3 +157,11 @@ export function getViewVertices (shape: IBodyShape): IVec2[] {
   })
 }
 
+export function getViewIncluded (shape: IBodyShape): IVec2[][] {
+  return shape.included.map((poly) => {
+    return poly.map((p) => {
+      const rotated = geo.rotate(p, shape.body.angle)
+      return geo.add(rotated, shape.body.position)
+    })
+  })
+}

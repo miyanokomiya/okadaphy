@@ -11,6 +11,7 @@
     "start": "parcel src/index.html"
   },
   "devDependencies": {
+    "@types/opentype": "^0.0.4",
     "parcel-bundler": "^1.11.0",
     "tslint": "^5.12.0",
     "tslint-config-standard": "^8.0.1",
@@ -22,6 +23,7 @@
     "lit-html": "^0.14.0",
     "matter-js": "^0.14.2",
     "okageo": "^1.0.0",
+    "opentype.js": "^1.1.0",
     "poly-decomp": "^0.3.0"
   }
 }

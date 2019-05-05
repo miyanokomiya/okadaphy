@@ -1,13 +1,17 @@
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
-import { IVec2 } from 'okageo'
+import { ISvgPath, IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import * as svg from 'okageo/src/svg'
+import * as opentype from 'opentype.js'
 import { IBodyShape, ISlash } from '../types/index'
 import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
 import { createShape, mergeShape, splitShape } from './shape'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 (window as any).decomp = require('poly-decomp')
+
+svg.configs.bezierSplitSize = 3
+svg.configs.ellipseSplitSize = 3
 
 export default class App {
   private canvas: HTMLCanvasElement
@@ -63,7 +67,12 @@ export default class App {
       this.canvas.width - margin * 2,
       this.canvas.height - margin * 2
     )
-    inRectList.forEach((info) => this.addShape(createShape(info)))
+    inRectList.forEach((info) => {
+      const s = createShape(info)
+      if (s) {
+        this.addShape(s)
+      }
+    })
     this.shapeList.forEach((shape) => {
       MBody.setAngularVelocity(shape.body, 0.01)
     })
@@ -80,8 +89,48 @@ export default class App {
       this.canvas.width - margin * 2,
       this.canvas.height - margin * 2
     )
-    inRectList.forEach((info) => this.addShape(createShape(info)))
+    inRectList.forEach((info) => {
+      const s = createShape(info)
+      if (s) {
+        this.addShape(s)
+      }
+    })
     this.draw()
+  }
+
+  public importFromString (str: string) {
+    opentype.load('/NotoSansCJKjp-Medium.otf', (err, font) => {
+      if (!font || err) {
+        console.log('Font could not be loaded: ' + err)
+        return
+      }
+      const fontPath = font.getPath(str, 0, 150, 72)
+      const groups = geo.getIncludedPolygonGroups(
+        svg.parseOpenPath(fontPath).map((info) => info.d))
+      const style = {
+        ...svg.createStyle(),
+        fill: true,
+        fillStyle: 'black', stroke: false
+      }
+      const pathInfoList: ISvgPath[] = groups.map((group) => {
+        const [d, ...included] = group
+        return { d, included, style }
+      })
+      const margin = FRAME_DEPTH + 100
+      svg.fitRect(
+        pathInfoList,
+        margin,
+        margin,
+        this.canvas.width - margin * 2,
+        this.canvas.height - margin * 2
+      ).forEach((info) => {
+        const s = createShape(info)
+        if (s) {
+          this.addShape(s)
+        }
+      })
+      this.draw()
+    })
   }
 
   public run () {
@@ -116,6 +165,7 @@ export default class App {
       this.ctx.rotate(shape.body.angle)
       svg.draw(this.ctx, {
         d: shape.vertices,
+        included: shape.included,
         style: shape.style
       })
       this.ctx.restore()
@@ -146,7 +196,7 @@ export default class App {
     }
 
     Events.on(this.engine, 'afterUpdate', () => this.afterUpdate())
-    Events.on(this.engine, 'collisionActive', (e) => this.collisionActive(e))
+    // Events.on(this.engine, 'collisionActive', (e) => this.collisionActive(e))
   }
 
   private addShape (shape: IBodyShape): void {

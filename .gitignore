@@ -2,7 +2,8 @@
 .DS_Store
 doc
 
-dist
+dist/*
+!dist/static
 
 # Logs
 logs

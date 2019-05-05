@@ -18,6 +18,7 @@ export default class App {
   private clearEventListener: () => void
   private ctx: CanvasRenderingContext2D
   private cursorDownPoint: IVec2 | null
+  private cursorMovePoint: IVec2 | null
   private engine: Engine
   private runner: Runner
   private running: boolean
@@ -30,6 +31,7 @@ export default class App {
     this.clearEventListener = () => { return }
     this.ctx = args.canvas.getContext('2d') as CanvasRenderingContext2D
     this.cursorDownPoint = null
+    this.cursorMovePoint = null
     this.engine = Engine.create()
     this.engine.world.gravity.scale = 0
     this.runner = Runner.create({})
@@ -211,15 +213,20 @@ export default class App {
   private initEventListener () {
     const onCursorDown = (e: MouseEvent | TouchEvent) => this.onCursorDown(e)
     const onCursorUp = (e: MouseEvent | TouchEvent) => this.onCursorUp(e)
+    const onCursorMove = (e: MouseEvent | TouchEvent) => this.onCursorMove(e)
     this.canvas.addEventListener('mousedown', onCursorDown, true)
     this.canvas.addEventListener('touchstart', onCursorDown, true)
     this.canvas.addEventListener('mouseup', onCursorUp, true)
     this.canvas.addEventListener('touchend', onCursorUp, true)
+    this.canvas.addEventListener('mousemove', onCursorMove, true)
+    this.canvas.addEventListener('touchmove', onCursorMove, true)
     this.clearEventListener = () => {
       this.canvas.removeEventListener('mousedown', onCursorDown, true)
       this.canvas.removeEventListener('touchstart', onCursorDown, true)
       this.canvas.removeEventListener('mouseup', onCursorUp, true)
       this.canvas.removeEventListener('touchend', onCursorUp, true)
+      this.canvas.removeEventListener('mousemove', onCursorMove, true)
+      this.canvas.removeEventListener('touchmove', onCursorMove, true)
     }
 
     Events.on(this.engine, 'afterUpdate', () => this.afterUpdate())
@@ -302,16 +309,22 @@ export default class App {
   }
 
   private onCursorDown (e: MouseEvent | TouchEvent) {
+    e.preventDefault()
     this.cursorDownPoint = getCursorPoint(e)
   }
 
+  private onCursorMove (e: MouseEvent | TouchEvent) {
+    e.preventDefault()
+    this.cursorMovePoint = getCursorPoint(e)
+  }
+
   private onCursorUp (e: MouseEvent | TouchEvent) {
-    if (!this.cursorDownPoint) return
+    e.preventDefault()
+    if (!this.cursorDownPoint || !this.cursorMovePoint) return
 
-    const p = getCursorPoint(e)
-    if (geo.isSame(this.cursorDownPoint, p)) return
+    if (geo.isSame(this.cursorDownPoint, this.cursorMovePoint)) return
 
-    this.slash(expandLine(this.cursorDownPoint, p))
+    this.slash(expandLine(this.cursorDownPoint, this.cursorMovePoint))
     this.cursorDownPoint = null
   }
 

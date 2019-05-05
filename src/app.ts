@@ -171,7 +171,7 @@ export default class App {
     return new Promise((resolve, reject) => {
       if (this.font) return resolve()
 
-      opentype.load('/static/NotoSansCJKjp-Medium.otf', (err, font) => {
+      opentype.load('https://fonts.gstatic.com/ea/notosansjapanese/v6/NotoSansJP-Medium.otf', (err, font) => {
         if (!font || err) {
           return reject(new Error('Font could not be loaded: ' + err))
         }

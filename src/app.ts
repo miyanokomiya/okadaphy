@@ -10,8 +10,8 @@ import { createShape, mergeShape, splitShape } from './shape'
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 (window as any).decomp = require('poly-decomp')
 
-svg.configs.bezierSplitSize = 3
-svg.configs.ellipseSplitSize = 3
+svg.configs.bezierSplitSize = 8
+svg.configs.ellipseSplitSize = 8
 
 export default class App {
   private canvas: HTMLCanvasElement
@@ -33,7 +33,8 @@ export default class App {
     this.cursorDownPoint = null
     this.cursorMovePoint = null
     this.engine = Engine.create()
-    this.engine.world.gravity.scale = 0
+    this.engine.world.gravity.x = 0
+    this.engine.world.gravity.y = 0
     this.runner = Runner.create({})
     this.running = false
     this.shapeList = []
@@ -101,9 +102,9 @@ export default class App {
     this.draw()
   }
 
-  public importFromString (str: string) {
+  public importFromString (args: { text: string, fillStyle: string, strokeStyle: string }) {
     this.loadFont().then(() => {
-      const lines = str.split(/\n|\r\n/)
+      const lines = args.text.split(/\n|\r\n/)
       const size = 72
       let pathList: IVec2[][] = []
       lines.forEach((line, i) => {
@@ -117,7 +118,9 @@ export default class App {
       const style = {
         ...svg.createStyle(),
         fill: true,
-        fillStyle: 'black', stroke: false
+        fillStyle: args.fillStyle,
+        stroke: false,
+        strokeStyle: args.strokeStyle
       }
       const pathInfoList: ISvgPath[] = groups.map((group) => {
         const [d, ...included] = group
@@ -138,6 +141,11 @@ export default class App {
       })
       this.draw()
     })
+  }
+
+  public setGravity (x: number, y: number) {
+    this.engine.world.gravity.x = x
+    this.engine.world.gravity.y = y
   }
 
   public run () {

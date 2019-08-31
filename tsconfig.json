@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2015",
     "module": "commonjs",
     "strict": true,
+    "jsx": "react",
     "esModuleInterop": true,
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "declaration": true
+    "declaration": true,
+    "rootDir": "./src",
+    "experimentalDecorators": true,
+    "lib": ["dom", "es2015"]
   }
 }
-

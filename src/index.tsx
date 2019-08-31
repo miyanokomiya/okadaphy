@@ -27,7 +27,7 @@ const App: React.FC = () => {
     <div>
       <Canvas
         width={window.innerWidth * 0.8}
-        height={innerHeight / 2}
+        height={innerHeight * 0.7}
         text={text}
         fillStyle={fillStyle}
         strokeStyle={strokeStyle}

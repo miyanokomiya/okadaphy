@@ -12,3 +12,11 @@ export interface ISlash {
   line: IVec2[]
   time: number
 }
+
+export interface IOptions {
+  text: string
+  fillStyle: string
+  strokeStyle: string
+  gravityX: number
+  gravityY: number
+}

@@ -1,4 +1,5 @@
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
+// import okageo, { ISvgPath, IVec2 } from 'okageo'
 import okageo, { ISvgPath, IVec2 } from 'okageo'
 import * as opentype from 'opentype.js'
 import { IBodyShape, ISlash } from '../types/index'

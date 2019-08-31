@@ -2806,6 +2806,11 @@ eslint-plugin-prettier@^3.1.0:
   dependencies:
     prettier-linter-helpers "^1.0.0"
 
+eslint-plugin-react-hooks@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-2.0.1.tgz#e898ec26a0a335af6f7b0ad1f0bedda7143ed756"
+  integrity sha512-xir+3KHKo86AasxlCV8AHRtIZPHljqCRRUYgASkbatmt0fad4+5GgC7zkT7o/06hdKM6MIwp8giHVXqBPaarHQ==
+
 eslint-plugin-react@^7.14.3:
   version "7.14.3"
   resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.14.3.tgz#911030dd7e98ba49e1b2208599571846a66bdf13"
@@ -4105,11 +4110,6 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-lit-html@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/lit-html/-/lit-html-1.1.2.tgz#2e3560a7075210243649c888ad738eaf0daa8374"
-  integrity sha512-FFlUMKHKi+qG1x1iHNZ1hrtc/zHmfYTyrSvs3/wBTvaNtpZjOZGWzU7efGYVpgp6KvWeKF6ql9/KsCq6Z/mEDA==
-
 loader-utils@^0.2.16:
   version "0.2.17"
   resolved "https://registry.yarnpkg.com/loader-utils/-/loader-utils-0.2.17.tgz#f86e6374d43205a6e6c60e9196f17c0299bfb348"
@@ -4676,10 +4676,10 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-okageo@^1.1.2:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/okageo/-/okageo-1.1.2.tgz#32667f2d4faa5855938f56671fe6ec77de88aeb8"
-  integrity sha512-fNNsWoC+XEZJw33VM+qIrrQT4EIl/i2gTKeWIMCHj80ncyJl4XOq2rIJZR5t3qJ6q+88XE7mtdIgkmQjG+VIZw==
+okageo@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/okageo/-/okageo-1.1.4.tgz#5163942bb2a16b6e182a7fc94ccc00aa5b14b26f"
+  integrity sha512-gBpP5KDZFEq2ARMbIvQpT73enYIPDjoAvq3OBAb3gPrirGw3yz66BNgVGvL/CW6rAN6Ek4gL/4Q7wDFXzBfrrA==
   dependencies:
     bili "^4.8.1"
 

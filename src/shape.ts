@@ -3,31 +3,6 @@ import { ISvgPath, IVec2 } from 'okageo'
 import * as geo from 'okageo/src/geo'
 import { IBodyShape } from '../types/index'
 
-export function mergeShape(shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape | null {
-  const rate = shapeA.body.area / shapeB.body.area
-  if (rate < 0.6 || 1.4 < rate) return null
-
-  const center = geo.getCenter(shapeA.body.position, shapeB.body.position)
-  const count = Math.random() * 13 + 3
-  const radius = geo.getRegularPolygonRadius(shapeA.body.area + shapeA.body.area, count)
-  const points: IVec2[] = []
-  for (let i = 0; i < count; i++) {
-    const t = ((2 * Math.PI) / count) * i
-    points.push({
-      x: center.x + radius * Math.cos(t),
-      y: center.y + radius * Math.sin(t),
-    })
-  }
-  const shape = createShape({
-    d: points,
-    style: shapeA.style,
-  })
-  if (!shape) return null
-
-  MBody.applyForce(shape.body, shape.body.position, geo.add(shapeA.body.force, shapeB.body.force))
-  return shape
-}
-
 export function createShape(path: ISvgPath): IBodyShape | null {
   // 同一座標を取り除いておく
   const d = geo.omitSamePoint(path.d)
@@ -61,6 +36,31 @@ export function createShape(path: ISvgPath): IBodyShape | null {
   }
 }
 
+export function mergeShape(shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape | null {
+  const rate = shapeA.body.area / shapeB.body.area
+  if (rate < 0.6 || 1.4 < rate) return null
+
+  const center = geo.getCenter(shapeA.body.position, shapeB.body.position)
+  const count = Math.random() * 13 + 3
+  const radius = geo.getRegularPolygonRadius(shapeA.body.area + shapeA.body.area, count)
+  const points: IVec2[] = []
+  for (let i = 0; i < count; i++) {
+    const t = ((2 * Math.PI) / count) * i
+    points.push({
+      x: center.x + radius * Math.cos(t),
+      y: center.y + radius * Math.sin(t),
+    })
+  }
+  const shape = createShape({
+    d: points,
+    style: shapeA.style,
+  })
+  if (!shape) return null
+
+  MBody.applyForce(shape.body, shape.body.position, geo.add(shapeA.body.force, shapeB.body.force))
+  return shape
+}
+
 export function getSlashForce(body: MBody, slash: IVec2[]) {
   const toSlash = geo.getUnit(geo.sub(slash[1], slash[0]))
   const pedal = geo.getPedal(body.position, slash)
@@ -68,6 +68,22 @@ export function getSlashForce(body: MBody, slash: IVec2[]) {
   const force = geo.add(toCross, geo.multi(toSlash, 0.3))
   const power = 1 / Math.max(Math.min(body.mass, 5), 1)
   return geo.multi(geo.getUnit(force), power)
+}
+
+export function getViewVertices(shape: IBodyShape): IVec2[] {
+  return shape.vertices.map(p => {
+    const rotated = geo.rotate(p, shape.body.angle)
+    return geo.add(rotated, shape.body.position)
+  })
+}
+
+export function getViewIncluded(shape: IBodyShape): IVec2[][] {
+  return shape.included.map(poly => {
+    return poly.map(p => {
+      const rotated = geo.rotate(p, shape.body.angle)
+      return geo.add(rotated, shape.body.position)
+    })
+  })
 }
 
 export function splitShape(shape: IBodyShape, line: IVec2[]): IBodyShape[] | null {
@@ -136,20 +152,4 @@ export function splitShape(shape: IBodyShape, line: IVec2[]): IBodyShape[] | nul
     MBody.setVelocity(s.body, geo.add(shape.body.velocity, getSlashForce(s.body, line)))
   })
   return splitedShapeList
-}
-
-export function getViewVertices(shape: IBodyShape): IVec2[] {
-  return shape.vertices.map(p => {
-    const rotated = geo.rotate(p, shape.body.angle)
-    return geo.add(rotated, shape.body.position)
-  })
-}
-
-export function getViewIncluded(shape: IBodyShape): IVec2[][] {
-  return shape.included.map(poly => {
-    return poly.map(p => {
-      const rotated = geo.rotate(p, shape.body.angle)
-      return geo.add(rotated, shape.body.position)
-    })
-  })
 }

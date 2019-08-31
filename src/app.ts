@@ -1,7 +1,5 @@
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
-import { ISvgPath, IVec2 } from 'okageo'
-import * as geo from 'okageo/src/geo'
-import * as svg from 'okageo/src/svg'
+import okageo, { ISvgPath, IVec2 } from 'okageo'
 import * as opentype from 'opentype.js'
 import { IBodyShape, ISlash } from '../types/index'
 import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
@@ -10,8 +8,34 @@ import { createShape, mergeShape, splitShape } from './shape'
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 ;(window as any).decomp = require('poly-decomp')
 
+const svg = okageo.svg
+const geo = okageo.geo
 svg.configs.bezierSplitSize = 8
 svg.configs.ellipseSplitSize = 8
+
+function getCursorPoint(e: MouseEvent | TouchEvent): IVec2 {
+  const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
+  const positionX = rect.left + window.pageXOffset
+  const positionY = rect.top + window.pageYOffset
+
+  if (e instanceof MouseEvent) {
+    return {
+      x: e.pageX - positionX,
+      y: e.pageY - positionY,
+    }
+  } else {
+    const touch = e.touches[0]
+    return {
+      x: touch.pageX - positionX,
+      y: touch.pageY - positionY,
+    }
+  }
+}
+
+function expandLine(a: IVec2, b: IVec2): IVec2[] {
+  const v = geo.multi(geo.getUnit(geo.sub(b, a)), 4000)
+  return [geo.sub(a, v), geo.add(a, v)]
+}
 
 export default class App {
   private canvas: HTMLCanvasElement
@@ -359,28 +383,4 @@ export default class App {
 
     this.draw()
   }
-}
-
-function getCursorPoint(e: MouseEvent | TouchEvent): IVec2 {
-  const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
-  const positionX = rect.left + window.pageXOffset
-  const positionY = rect.top + window.pageYOffset
-
-  if (window.TouchEvent && e instanceof TouchEvent) {
-    const touch = e.touches[0]
-    return {
-      x: touch.pageX - positionX,
-      y: touch.pageY - positionY,
-    }
-  } else {
-    return {
-      x: e.pageX - positionX,
-      y: e.pageY - positionY,
-    }
-  }
-}
-
-function expandLine(a: IVec2, b: IVec2): IVec2[] {
-  const v = geo.multi(geo.getUnit(geo.sub(b, a)), 4000)
-  return [geo.sub(a, v), geo.add(a, v)]
 }

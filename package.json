@@ -30,7 +30,7 @@
     "@types/matter-js": "^0.10.2",
     "lit-html": "^1.1.2",
     "matter-js": "^0.14.2",
-    "okageo": "^1.0.18",
+    "okageo": "^1.1.2",
     "opentype.js": "^1.1.0",
     "poly-decomp": "^0.3.0",
     "react": "^16.9.0",

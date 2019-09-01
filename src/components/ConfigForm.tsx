@@ -6,47 +6,72 @@ import Slider from '@material-ui/core/Slider'
 import Typography from '@material-ui/core/Typography'
 import { CompactPicker, ColorResult } from 'react-color'
 import PropTypes from 'prop-types'
-import { IOptions } from '../../types'
+import { IConfig } from '../../types'
 
-type Props = IOptions & {
-  onSubmit: (options: IOptions) => void
+type Props = {
+  config: IConfig
+  onSubmit: (options: IConfig, force?: boolean) => void
 }
 
 const OptionForm: React.FC<Props> = props => {
-  const [draftText, setDraftText] = React.useState(props.text)
-  const [draftFillStyle, setDraftFillStyle] = React.useState(props.fillStyle)
-  const [draftStrokeStyle, setDraftStrokeStyle] = React.useState(props.strokeStyle)
-  const [draftGravityX, setDraftGravityX] = React.useState(props.gravityX)
-  const [draftGravityY, setDraftGravityY] = React.useState(props.gravityY)
+  const [draftText, setDraftText] = React.useState(props.config.text)
 
   const onInputDraftText = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDraftText(e.currentTarget.value)
   }, [])
-  const onInputDraftFillStyle = React.useCallback((color: ColorResult) => {
-    setDraftFillStyle(color.hex)
-  }, [])
-  const onInputDraftStrokeStyle = React.useCallback((color: ColorResult) => {
-    setDraftStrokeStyle(color.hex)
-  }, [])
-  const onInputDraftGravityX = React.useCallback((_, value: any) => {
-    setDraftGravityX(value)
-  }, [])
-  const onInputDraftGravityY = React.useCallback((_, value: any) => {
-    setDraftGravityY(value)
-  }, [])
+
+  const onInputDraftFillStyle = React.useCallback(
+    (color: ColorResult) => {
+      props.onSubmit({
+        ...props.config,
+        fillStyle: color.hex,
+      })
+    },
+    [props],
+  )
+
+  const onInputDraftStrokeStyle = React.useCallback(
+    (color: ColorResult) => {
+      props.onSubmit({
+        ...props.config,
+        strokeStyle: color.hex,
+      })
+    },
+    [props],
+  )
+
+  const onInputDraftGravityX = React.useCallback(
+    (_, value: any) => {
+      props.onSubmit({
+        ...props.config,
+        gravityX: value,
+      })
+    },
+    [props],
+  )
+
+  const onInputDraftGravityY = React.useCallback(
+    (_, value: any) => {
+      props.onSubmit({
+        ...props.config,
+        gravityY: value,
+      })
+    },
+    [props],
+  )
 
   const onSubmit = React.useCallback(
     (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
-      props.onSubmit({
-        text: draftText,
-        fillStyle: draftFillStyle,
-        strokeStyle: draftStrokeStyle,
-        gravityX: draftGravityX,
-        gravityY: draftGravityY,
-      })
+      props.onSubmit(
+        {
+          ...props.config,
+          text: draftText,
+        },
+        true,
+      )
     },
-    [props, draftText, draftFillStyle, draftStrokeStyle, draftGravityX, draftGravityY],
+    [props, draftText],
   )
 
   return (
@@ -73,11 +98,11 @@ const OptionForm: React.FC<Props> = props => {
       <Grid container style={{ marginTop: '1rem' }} spacing={2}>
         <Grid item>
           <Typography>Fill</Typography>
-          <CompactPicker color={draftFillStyle} onChange={onInputDraftFillStyle} />
+          <CompactPicker color={props.config.fillStyle} onChange={onInputDraftFillStyle} />
         </Grid>
         <Grid item>
           <Typography>Stroke</Typography>
-          <CompactPicker color={draftStrokeStyle} onChange={onInputDraftStrokeStyle} />
+          <CompactPicker color={props.config.strokeStyle} onChange={onInputDraftStrokeStyle} />
         </Grid>
       </Grid>
       <Grid container style={{ marginTop: '1rem' }} spacing={2}>
@@ -89,7 +114,7 @@ const OptionForm: React.FC<Props> = props => {
             step={0.0001}
             min={-0.05}
             max={0.05}
-            value={draftGravityX}
+            value={props.config.gravityX}
             onChange={onInputDraftGravityX}
           />
         </Grid>
@@ -101,7 +126,7 @@ const OptionForm: React.FC<Props> = props => {
             step={0.0001}
             min={-0.05}
             max={0.05}
-            value={draftGravityY}
+            value={props.config.gravityY}
             onChange={onInputDraftGravityY}
           />
         </Grid>
@@ -111,11 +136,13 @@ const OptionForm: React.FC<Props> = props => {
 }
 
 OptionForm.propTypes = {
-  text: PropTypes.string.isRequired,
-  fillStyle: PropTypes.string.isRequired,
-  strokeStyle: PropTypes.string.isRequired,
-  gravityX: PropTypes.number.isRequired,
-  gravityY: PropTypes.number.isRequired,
+  config: PropTypes.shape({
+    text: PropTypes.string.isRequired,
+    fillStyle: PropTypes.string.isRequired,
+    strokeStyle: PropTypes.string.isRequired,
+    gravityX: PropTypes.number.isRequired,
+    gravityY: PropTypes.number.isRequired,
+  }).isRequired,
   onSubmit: PropTypes.func.isRequired,
 }
 OptionForm.defaultProps = {}

@@ -3,23 +3,22 @@ import * as React from 'react'
 import { render } from 'react-dom'
 import Canvas from './components/Canvas'
 import ConfigForm from './components/ConfigForm'
-import { IOptions } from '../types'
+import { IConfig } from '../types'
 
 const App: React.FC = () => {
   const [count, refresh] = React.useState(0)
-  const [text, setText] = React.useState('岡田を\n切る技術')
-  const [fillStyle, setFillStyle] = React.useState('#000')
-  const [strokeStyle, setStrokeStyle] = React.useState('#fefb00')
-  const [gravityX, setGravityX] = React.useState(0)
-  const [gravityY, setGravityY] = React.useState(0)
+  const [config, setConfig] = React.useState({
+    text: '岡田を\n切る技術',
+    fillStyle: '#000',
+    strokeStyle: '#fefb00',
+    gravityX: 0,
+    gravityY: 0,
+  })
+
   const onSubmit = React.useCallback(
-    (options: IOptions) => {
-      setText(options.text)
-      setFillStyle(options.fillStyle)
-      setStrokeStyle(options.strokeStyle)
-      setGravityX(options.gravityX)
-      setGravityY(options.gravityY)
-      refresh(count + 1)
+    (config: IConfig, force = false) => {
+      setConfig(config)
+      if (force) refresh(count + 1)
     },
     [count],
   )
@@ -29,21 +28,10 @@ const App: React.FC = () => {
       <Canvas
         width={window.innerWidth * 0.8}
         height={innerHeight * 0.7}
-        text={text}
-        fillStyle={fillStyle}
-        strokeStyle={strokeStyle}
-        gravityX={gravityX}
-        gravityY={gravityY}
+        config={config}
         count={count}
       />
-      <ConfigForm
-        text={text}
-        fillStyle={fillStyle}
-        strokeStyle={strokeStyle}
-        gravityX={gravityX}
-        gravityY={gravityY}
-        onSubmit={onSubmit}
-      />
+      <ConfigForm config={config} onSubmit={onSubmit} />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
-import okageo, { IVec2 } from 'okageo'
+import okageo, { IVec2, ISvgStyle } from 'okageo'
 import { IBodyShape, ISlash } from '../types/index'
 import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
 import { createShape, mergeShape, splitShape } from './shape'
@@ -28,6 +28,7 @@ export default class App {
   private running: boolean
   private shapeList: IBodyShape[]
   private slashList: ISlash[]
+  private style: ISvgStyle
 
   constructor(args: { canvas: HTMLCanvasElement }) {
     this.canvas = args.canvas
@@ -44,6 +45,13 @@ export default class App {
     this.running = false
     this.shapeList = []
     this.slashList = []
+    this.style = {
+      ...okageo.svg.createStyle(),
+      fill: true,
+      fillStyle: 'gray',
+      stroke: true,
+      strokeStyle: 'yellow',
+    }
 
     // 壁生成
     World.add(this.engine.world, getFrameBodies(this.canvas.width, this.canvas.height))
@@ -56,13 +64,7 @@ export default class App {
     const pathInfoList = [
       {
         d: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }],
-        style: {
-          ...okageo.svg.createStyle(),
-          fill: true,
-          fillStyle: 'gray',
-          stroke: true,
-          strokeStyle: 'yellow',
-        },
+        style: this.style,
       },
     ]
     const margin = FRAME_DEPTH * 14
@@ -100,8 +102,8 @@ export default class App {
     this.draw()
   }
 
-  public async importFromString(args: { text: string; fillStyle: string; strokeStyle: string }) {
-    const pathInfoList = await parseFont(args)
+  public async importFromString(text: string) {
+    const pathInfoList = await parseFont(text, this.style)
     const margin = FRAME_DEPTH + 30
     okageo.svg
       .fitRect(
@@ -120,6 +122,10 @@ export default class App {
   public setGravity(x: number, y: number) {
     this.engine.world.gravity.x = x
     this.engine.world.gravity.y = y
+  }
+
+  public setStyle(style: Partial<ISvgStyle>) {
+    this.style = { ...this.style, ...style }
   }
 
   public run() {
@@ -163,7 +169,7 @@ export default class App {
       okageo.svg.draw(this.ctx, {
         d: shape.vertices,
         included: shape.included,
-        style: shape.style,
+        style: this.style,
       })
       this.ctx.restore()
     })

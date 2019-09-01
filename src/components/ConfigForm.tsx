@@ -1,6 +1,12 @@
 import * as React from 'react'
+import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
+import TextField from '@material-ui/core/TextField'
+import Slider from '@material-ui/core/Slider'
+import Typography from '@material-ui/core/Typography'
+import { CompactPicker, ColorResult } from 'react-color'
 import PropTypes from 'prop-types'
-import { IOptions } from '../types'
+import { IOptions } from '../../types'
 
 type Props = IOptions & {
   onSubmit: (options: IOptions) => void
@@ -13,20 +19,20 @@ const OptionForm: React.FC<Props> = props => {
   const [draftGravityX, setDraftGravityX] = React.useState(props.gravityX)
   const [draftGravityY, setDraftGravityY] = React.useState(props.gravityY)
 
-  const onInputDraftText = React.useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
+  const onInputDraftText = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setDraftText(e.currentTarget.value)
   }, [])
-  const onInputDraftFillStyle = React.useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setDraftFillStyle(e.currentTarget.value)
+  const onInputDraftFillStyle = React.useCallback((color: ColorResult) => {
+    setDraftFillStyle(color.hex)
   }, [])
-  const onInputDraftStrokeStyle = React.useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setDraftStrokeStyle(e.currentTarget.value)
+  const onInputDraftStrokeStyle = React.useCallback((color: ColorResult) => {
+    setDraftStrokeStyle(color.hex)
   }, [])
-  const onInputDraftGravityX = React.useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setDraftGravityX(parseFloat(e.currentTarget.value))
+  const onInputDraftGravityX = React.useCallback((_, value: any) => {
+    setDraftGravityX(value)
   }, [])
-  const onInputDraftGravityY = React.useCallback((e: React.FormEvent<HTMLInputElement>) => {
-    setDraftGravityY(parseFloat(e.currentTarget.value))
+  const onInputDraftGravityY = React.useCallback((_, value: any) => {
+    setDraftGravityY(value)
   }, [])
 
   const onSubmit = React.useCallback(
@@ -45,35 +51,61 @@ const OptionForm: React.FC<Props> = props => {
 
   return (
     <form onSubmit={onSubmit}>
-      <textarea cols={30} rows={3} value={draftText} onChange={onInputDraftText} />
-      <button>Run</button>
-      <br />
-      <br />
-      面:
-      <input type="color" value={draftFillStyle} onChange={onInputDraftFillStyle} />
-      <br />
-      線:
-      <input type="color" value={draftStrokeStyle} onChange={onInputDraftStrokeStyle} />
-      <br />
-      重力x:
-      <input
-        min="-0.05"
-        max="0.05"
-        step="0.0001"
-        type="range"
-        value={draftGravityX}
-        onChange={onInputDraftGravityX}
-      />
-      <br />
-      重力y:
-      <input
-        min="-0.05"
-        max="0.05"
-        step="0.0001"
-        type="range"
-        value={draftGravityY}
-        onChange={onInputDraftGravityY}
-      />
+      <Grid container>
+        <Grid item>
+          <Button type="submit" variant="contained" color="primary">
+            Run
+          </Button>
+        </Grid>
+      </Grid>
+      <Grid container style={{ marginTop: '1rem' }}>
+        <Grid item xs={12}>
+          <Typography>Text</Typography>
+          <TextField
+            multiline
+            fullWidth
+            variant="outlined"
+            value={draftText}
+            onChange={onInputDraftText}
+          />
+        </Grid>
+      </Grid>
+      <Grid container style={{ marginTop: '1rem' }} spacing={2}>
+        <Grid item>
+          <Typography>Fill</Typography>
+          <CompactPicker color={draftFillStyle} onChange={onInputDraftFillStyle} />
+        </Grid>
+        <Grid item>
+          <Typography>Stroke</Typography>
+          <CompactPicker color={draftStrokeStyle} onChange={onInputDraftStrokeStyle} />
+        </Grid>
+      </Grid>
+      <Grid container style={{ marginTop: '1rem' }} spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <Typography>Gravity X</Typography>
+          <Slider
+            marks={[{ value: 0, label: '0' }]}
+            valueLabelFormat={v => v * 1000}
+            step={0.0001}
+            min={-0.05}
+            max={0.05}
+            value={draftGravityX}
+            onChange={onInputDraftGravityX}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <Typography>Gravity Y</Typography>
+          <Slider
+            valueLabelFormat={v => v * 1000}
+            marks={[{ value: 0, label: '0' }]}
+            step={0.0001}
+            min={-0.05}
+            max={0.05}
+            value={draftGravityY}
+            onChange={onInputDraftGravityY}
+          />
+        </Grid>
+      </Grid>
     </form>
   )
 }

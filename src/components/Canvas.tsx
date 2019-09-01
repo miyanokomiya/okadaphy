@@ -1,7 +1,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
-import App from './app'
-import { IOptions } from '../types'
+import App from '../app'
+import { IOptions } from '../../types'
 
 type Props = IOptions & {
   width?: number

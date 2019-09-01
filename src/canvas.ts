@@ -18,4 +18,3 @@ export function getCursorPoint(e: MouseEvent | TouchEvent): IVec2 {
     }
   }
 }
-

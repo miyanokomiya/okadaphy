@@ -1,41 +1,20 @@
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
-// import okageo, { ISvgPath, IVec2 } from 'okageo'
-import okageo, { ISvgPath, IVec2 } from 'okageo'
-import * as opentype from 'opentype.js'
+import okageo, { IVec2 } from 'okageo'
 import { IBodyShape, ISlash } from '../types/index'
 import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
 import { createShape, mergeShape, splitShape } from './shape'
+import { parseFont } from './font'
+import { getCursorPoint } from './canvas'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 ;(window as any).decomp = require('poly-decomp')
 
-const svg = okageo.svg
-const geo = okageo.geo
-svg.configs.bezierSplitSize = 8
-svg.configs.ellipseSplitSize = 8
-
-function getCursorPoint(e: MouseEvent | TouchEvent): IVec2 {
-  const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()
-  const positionX = rect.left + window.pageXOffset
-  const positionY = rect.top + window.pageYOffset
-
-  if (e instanceof MouseEvent) {
-    return {
-      x: e.pageX - positionX,
-      y: e.pageY - positionY,
-    }
-  } else {
-    const touch = e.touches[0]
-    return {
-      x: touch.pageX - positionX,
-      y: touch.pageY - positionY,
-    }
-  }
-}
+okageo.svg.configs.bezierSplitSize = 8
+okageo.svg.configs.ellipseSplitSize = 8
 
 function expandLine(a: IVec2, b: IVec2): IVec2[] {
-  const v = geo.multi(geo.getUnit(geo.sub(b, a)), 4000)
-  return [geo.sub(a, v), geo.add(a, v)]
+  const v = okageo.geo.multi(okageo.geo.getUnit(okageo.geo.sub(b, a)), 4000)
+  return [okageo.geo.sub(a, v), okageo.geo.add(a, v)]
 }
 
 export default class App {
@@ -49,7 +28,6 @@ export default class App {
   private running: boolean
   private shapeList: IBodyShape[]
   private slashList: ISlash[]
-  private font: any
 
   constructor(args: { canvas: HTMLCanvasElement }) {
     this.canvas = args.canvas
@@ -79,100 +57,64 @@ export default class App {
       {
         d: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }],
         style: {
+          ...okageo.svg.createStyle(),
           fill: true,
-          fillGlobalAlpha: 1,
           fillStyle: 'gray',
-          lineCap: 'butt',
-          lineDash: [],
-          lineJoin: 'bevel',
-          lineWidth: 1,
           stroke: true,
-          strokeGlobalAlpha: 1,
           strokeStyle: 'yellow',
         },
       },
     ]
     const margin = FRAME_DEPTH * 14
-    const inRectList = svg.fitRect(
-      pathInfoList,
-      margin,
-      margin,
-      this.canvas.width - margin * 2,
-      this.canvas.height - margin * 2,
-    )
-    inRectList.forEach(info => {
-      const s = createShape(info)
-      if (s) {
+    okageo.svg
+      .fitRect(
+        pathInfoList,
+        margin,
+        margin,
+        this.canvas.width - margin * 2,
+        this.canvas.height - margin * 2,
+      )
+      .map(info => createShape(info))
+      .filter(<T>(info: T | null): info is T => !!info)
+      .forEach(s => {
+        MBody.setAngularVelocity(s.body, 0.01)
         this.addShape(s)
-      }
-    })
-    this.shapeList.forEach(shape => {
-      MBody.setAngularVelocity(shape.body, 0.01)
-    })
+      })
     this.draw()
   }
 
   public importFromSVG(svgStr: string) {
-    const pathInfoList = svg.parseSvgGraphicsStr(svgStr)
+    const pathInfoList = okageo.svg.parseSvgGraphicsStr(svgStr)
     const margin = FRAME_DEPTH
-    const inRectList = svg.fitRect(
-      pathInfoList,
-      margin,
-      margin,
-      this.canvas.width - margin * 2,
-      this.canvas.height - margin * 2,
-    )
-    inRectList.forEach(info => {
-      const s = createShape(info)
-      if (s) {
-        this.addShape(s)
-      }
-    })
+    okageo.svg
+      .fitRect(
+        pathInfoList,
+        margin,
+        margin,
+        this.canvas.width - margin * 2,
+        this.canvas.height - margin * 2,
+      )
+      .map(info => createShape(info))
+      .filter(<T>(info: T | null): info is T => !!info)
+      .forEach(s => this.addShape(s))
     this.draw()
   }
 
-  public importFromString(args: { text: string; fillStyle: string; strokeStyle: string }) {
-    this.loadFont().then(() => {
-      const lines = args.text.split(/\n|\r\n/)
-      const size = 72
-      let pathList: IVec2[][] = []
-      lines.forEach((line, i) => {
-        const top = size * 1.1 * i
-        const fontPath = this.font.getPath(line, 0, top, size)
-        pathList = pathList.concat(
-          svg.parseOpenPath(fontPath).map(info => geo.omitSamePoint(info.d)),
-        )
-      })
-
-      const groups = geo.getIncludedPolygonGroups(pathList)
-      const style = {
-        ...svg.createStyle(),
-        fill: true,
-        fillStyle: args.fillStyle,
-        stroke: false,
-        strokeStyle: args.strokeStyle,
-      }
-      const pathInfoList: ISvgPath[] = groups.map(group => {
-        const [d, ...included] = group
-        return { d, included, style }
-      })
-      const margin = FRAME_DEPTH + 30
-      svg
-        .fitRect(
-          pathInfoList,
-          margin,
-          margin,
-          this.canvas.width - margin * 2,
-          this.canvas.height - margin * 2,
-        )
-        .forEach(info => {
-          const s = createShape(info)
-          if (s) {
-            this.addShape(s)
-          }
-        })
-      this.draw()
-    })
+  public async importFromString(args: { text: string; fillStyle: string; strokeStyle: string }) {
+    const pathInfoList = await parseFont(args)
+    const margin = FRAME_DEPTH + 30
+    okageo.svg
+      .fitRect(
+        pathInfoList,
+        margin,
+        margin,
+        this.canvas.width - margin * 2,
+        this.canvas.height - margin * 2,
+      )
+      .map(info => createShape(info))
+      .filter(<T>(info: T | null): info is T => !!info)
+      .forEach(s => this.addShape(s))
+    this.draw()
   }
 
   public setGravity(x: number, y: number) {
@@ -209,23 +151,6 @@ export default class App {
     return this.running
   }
 
-  private loadFont(): Promise<undefined> {
-    return new Promise((resolve, reject) => {
-      if (this.font) return resolve()
-
-      opentype.load(
-        'https://fonts.gstatic.com/ea/notosansjapanese/v6/NotoSansJP-Medium.otf',
-        (err, font) => {
-          if (!font || err) {
-            return reject(new Error('Font could not be loaded: ' + err))
-          }
-          this.font = font
-          return resolve()
-        },
-      )
-    })
-  }
-
   private draw() {
     if (!this.ctx) return
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
@@ -235,7 +160,7 @@ export default class App {
       this.ctx.save()
       this.ctx.translate(shape.body.position.x, shape.body.position.y)
       this.ctx.rotate(shape.body.angle)
-      svg.draw(this.ctx, {
+      okageo.svg.draw(this.ctx, {
         d: shape.vertices,
         included: shape.included,
         style: shape.style,
@@ -331,10 +256,10 @@ export default class App {
       this.shapeList.forEach(shape => {
         if (base.body.id === shape.body.id) return
 
-        const vec = geo.sub(base.body.position, shape.body.position)
-        const d = geo.getNorm(vec)
+        const vec = okageo.geo.sub(base.body.position, shape.body.position)
+        const d = okageo.geo.getNorm(vec)
         if (d < 1) return
-        const force = geo.multi(vec, (0.00001 * base.body.mass) / Math.pow(d, 2))
+        const force = okageo.geo.multi(vec, (0.00001 * base.body.mass) / Math.pow(d, 2))
         MBody.applyForce(shape.body, shape.body.position, force)
       })
     })
@@ -343,10 +268,10 @@ export default class App {
   private pullCenter() {
     const center = { x: this.canvas.width / 2, y: this.canvas.height / 2 }
     this.shapeList.forEach(shape => {
-      const vec = geo.sub(center, shape.body.position)
-      const d = geo.getNorm(vec)
+      const vec = okageo.geo.sub(center, shape.body.position)
+      const d = okageo.geo.getNorm(vec)
       if (d < 1) return
-      const force = geo.multi(vec, 0.00001 / Math.pow(d, 2))
+      const force = okageo.geo.multi(vec, 0.00001 / Math.pow(d, 2))
       MBody.applyForce(shape.body, shape.body.position, force)
     })
   }
@@ -365,7 +290,7 @@ export default class App {
     e.preventDefault()
     if (!this.cursorDownPoint || !this.cursorMovePoint) return
 
-    if (geo.isSame(this.cursorDownPoint, this.cursorMovePoint)) return
+    if (okageo.geo.isSame(this.cursorDownPoint, this.cursorMovePoint)) return
 
     this.slash(expandLine(this.cursorDownPoint, this.cursorMovePoint))
     this.cursorDownPoint = null

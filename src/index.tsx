@@ -1,7 +1,8 @@
+import 'regenerator-runtime/runtime'
 import * as React from 'react'
 import { render } from 'react-dom'
-import Canvas from './Canvas'
-import ConfigForm from './ConfigForm'
+import Canvas from './components/Canvas'
+import ConfigForm from './components/ConfigForm'
 import { IOptions } from '../types'
 
 const App: React.FC = () => {

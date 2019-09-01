@@ -1,5 +1,7 @@
 import * as React from 'react'
 import PropTypes from 'prop-types'
+import Grid from '@material-ui/core/Grid'
+import Button from '@material-ui/core/Button'
 import App from '../app'
 import { IConfig } from '../../types'
 
@@ -13,12 +15,14 @@ type Props = {
 const Canvas: React.FC<Props> = props => {
   const canvasRef = React.useRef(null)
   const [app, setApp] = React.useState<App | null>(null)
+  const [running, setRunning] = React.useState(true)
 
   // app初期化と片付け
   React.useEffect(() => {
     const app = new App({ canvas: canvasRef.current as any })
     app.run()
     setApp(app)
+    setRunning(true)
     return () => app.dispose()
   }, [])
 
@@ -27,7 +31,7 @@ const Canvas: React.FC<Props> = props => {
     if (!app) return
     app.clear()
     app.importFromString(props.config.text)
-  }, [props.config.text, props.count, app])
+  }, [app, props.config.text, props.count])
 
   // プロパティ反映
   React.useEffect(() => {
@@ -42,7 +46,38 @@ const Canvas: React.FC<Props> = props => {
     props.config.strokeStyle,
   ])
 
-  return <canvas ref={canvasRef} width={props.width} height={props.height} />
+  const onClickPlay = React.useCallback(() => {
+    if (!app) return
+    running ? app.stop() : app.run()
+    setRunning(!running)
+  }, [app, running])
+
+  const onClickStep = React.useCallback(() => {
+    if (!app) return
+    app.step()
+  }, [app])
+
+  return (
+    <div>
+      <canvas ref={canvasRef} width={props.width} height={props.height} />
+      <Grid container spacing={2}>
+        <Grid item>
+          <Button
+            variant="contained"
+            color={running ? 'secondary' : 'primary'}
+            onClick={onClickPlay}
+          >
+            {running ? 'Pause' : 'Start'}
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button variant="contained" onClick={onClickStep}>
+            Step
+          </Button>
+        </Grid>
+      </Grid>
+    </div>
+  )
 }
 
 Canvas.propTypes = {

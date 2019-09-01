@@ -1,6 +1,7 @@
 import 'regenerator-runtime/runtime'
 import * as React from 'react'
 import { render } from 'react-dom'
+import Link from '@material-ui/core/Link'
 import Canvas from './components/Canvas'
 import ConfigForm from './components/ConfigForm'
 import { IConfig } from '../types'
@@ -26,12 +27,15 @@ const App: React.FC = () => {
   return (
     <div>
       <Canvas
-        width={window.innerWidth * 0.8}
+        width={window.innerWidth - 16}
         height={innerHeight * 0.7}
         config={config}
         count={count}
       />
-      <ConfigForm config={config} onSubmit={onSubmit} />
+      <div style={{ marginTop: '1rem' }}>
+        <ConfigForm config={config} onSubmit={onSubmit} />
+      </div>
+      <Link href="https://github.com/miyanokomiya/okadaphy">Github</Link>
     </div>
   )
 }

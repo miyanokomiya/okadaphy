@@ -138,6 +138,10 @@ export default class App {
     this.running = false
   }
 
+  public step() {
+    Engine.update(this.engine)
+  }
+
   public clear() {
     Engine.clear(this.engine)
     this.cursorDownPoint = null

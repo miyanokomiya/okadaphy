@@ -78,8 +78,8 @@ const OptionForm: React.FC<Props> = props => {
     <form onSubmit={onSubmit}>
       <Grid container>
         <Grid item>
-          <Button type="submit" variant="contained" color="primary">
-            Run
+          <Button type="submit" variant="contained">
+            Reset
           </Button>
         </Grid>
       </Grid>

@@ -13,7 +13,7 @@ export interface ISlash {
   time: number
 }
 
-export interface IOptions {
+export interface IConfig {
   text: string
   fillStyle: string
   strokeStyle: string

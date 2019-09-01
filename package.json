@@ -14,6 +14,7 @@
   "devDependencies": {
     "@types/opentype": "^0.0.4",
     "@types/react": "^16.9.2",
+    "@types/react-color": "^3.0.1",
     "@types/react-dom": "^16.9.0",
     "@typescript-eslint/eslint-plugin": "^2.0.0",
     "@typescript-eslint/parser": "^2.0.0",
@@ -28,12 +29,14 @@
     "typescript": "^3.6.2"
   },
   "dependencies": {
+    "@material-ui/core": "^4.4.0",
     "@types/matter-js": "^0.10.2",
     "matter-js": "^0.14.2",
     "okageo": "^1.1.5",
     "opentype.js": "^1.1.0",
     "poly-decomp": "^0.3.0",
     "react": "^16.9.0",
+    "react-color": "^2.17.3",
     "react-dom": "^16.9.0"
   }
 }

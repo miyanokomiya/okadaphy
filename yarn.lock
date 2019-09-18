@@ -1017,10 +1017,10 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.3.tgz#bdfd69d61e464dcc81b25159c270d75a73c1a636"
   integrity sha512-Il2DtDVRGDcqjDtE+rF8iqg1CArehSK84HZJCT7AMITlyXRBpuPhqGLDQMowraqqu1coEaimg4ZOqggt6L6L+A==
 
-"@types/matter-js@^0.10.2":
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/@types/matter-js/-/matter-js-0.10.2.tgz#49c20c23316637538c860f6d2e3d4d89b20a6551"
-  integrity sha512-7zg46Fx+nPIZ+WlK0Xud8L2IKk9BsilA7hgw+60o75/hM0fnx5MgufCpNPQB+69N+0WFirX5fhoHdmYdzkwdGw==
+"@types/matter-js@^0.10.3":
+  version "0.10.3"
+  resolved "https://registry.yarnpkg.com/@types/matter-js/-/matter-js-0.10.3.tgz#0a55dd82ae3798ac9701ccbb66b439cc208aa73f"
+  integrity sha512-offDHyoKgOHTVKt/A4mA5tZLFX1HS8kENrb+qVn4wZeZb38NHqjN/olel6TvqJtpvSDuA9GsS2vhTgkSLDYv1w==
 
 "@types/minimatch@3.0.3":
   version "3.0.3"

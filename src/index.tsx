@@ -6,7 +6,7 @@ import Canvas from './components/Canvas'
 import ConfigForm from './components/ConfigForm'
 import { IConfig } from '../types'
 
-const App: React.FC = () => {
+export const App: React.FC = () => {
   const [count, refresh] = React.useState(0)
   const [config, setConfig] = React.useState({
     text: '岡田を\n切る技術',
@@ -40,4 +40,7 @@ const App: React.FC = () => {
   )
 }
 
-render(<App />, document.getElementById('root') as any)
+const root = document.getElementById('root')
+if (root) {
+  render(<App />, root)
+}

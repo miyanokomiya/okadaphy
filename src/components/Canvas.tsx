@@ -5,7 +5,7 @@ import Button from '@material-ui/core/Button'
 import App from '../app'
 import { IConfig } from '../../types'
 
-type Props = {
+export type Props = {
   width?: number
   height?: number
   config: IConfig

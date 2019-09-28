@@ -8,7 +8,7 @@ import { CompactPicker, ColorResult } from 'react-color'
 import PropTypes from 'prop-types'
 import { IConfig } from '../../types'
 
-type Props = {
+export type Props = {
   config: IConfig
   onSubmit: (options: IConfig, force?: boolean) => void
 }

@@ -15,7 +15,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.18",
     "@types/opentype": "^0.0.4",
-    "@types/react": "^16.9.3",
+    "@types/react": "^16.9.5",
     "@types/react-color": "^3.0.1",
     "@types/react-dom": "^16.9.1",
     "@types/react-test-renderer": "^16.9.0",

@@ -35,7 +35,7 @@
     "react-test-renderer": "^16.10.2",
     "ts-jest": "^24.1.0",
     "typedoc": "^0.15.0",
-    "typescript": "^3.6.3"
+    "typescript": "^3.6.4"
   },
   "dependencies": {
     "@material-ui/core": "^4.5.1",

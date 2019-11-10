@@ -5442,10 +5442,10 @@ object.values@^1.1.0:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-okageo@^1.1.5:
-  version "1.1.5"
-  resolved "https://registry.yarnpkg.com/okageo/-/okageo-1.1.5.tgz#bf34c586816d3259865b1b0e9a765989d6ebc46e"
-  integrity sha512-Kr5Sp4Q1HDCC3u/up1rnVUhXctvBWz9D/nIx+i9UIjUL0ba/ztFDvFNZu/gFZa7grFMHtx/SPTqVJre075JvIw==
+okageo@^1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/okageo/-/okageo-1.1.6.tgz#3ea4fe7ffa2b9aed7d5056c94cb8c141d89ba181"
+  integrity sha512-8VJFjFQWVLnZKnRsfTNMFHVDXVmokdwFTTrXeL8OBBI2j+5cYMBoPa284pmiKS4byF0HzVY4TgsGgNU2OwUi8w==
   dependencies:
     bili "^4.8.1"
 

@@ -41,7 +41,7 @@
     "@material-ui/core": "^4.5.1",
     "@types/matter-js": "^0.10.4",
     "matter-js": "^0.14.2",
-    "okageo": "^1.1.5",
+    "okageo": "^1.1.6",
     "opentype.js": "^1.1.0",
     "poly-decomp": "^0.3.0",
     "react": "^16.11.0",

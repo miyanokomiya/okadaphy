@@ -38,7 +38,7 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@material-ui/core": "^4.5.1",
+    "@material-ui/core": "^4.6.0",
     "@types/matter-js": "^0.10.4",
     "matter-js": "^0.14.2",
     "okageo": "^1.1.6",

@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@material-ui/core": "^4.7.0",
-    "@types/matter-js": "^0.10.4",
+    "@types/matter-js": "^0.10.5",
     "matter-js": "^0.14.2",
     "okageo": "^1.1.7",
     "opentype.js": "^1.1.0",

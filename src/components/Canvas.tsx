@@ -12,7 +12,7 @@ export type Props = {
   count?: number
 }
 
-const Canvas: React.FC<Props> = props => {
+const Canvas: React.FC<Props> = (props) => {
   const canvasRef = React.useRef(null)
   const [app, setApp] = React.useState<App | null>(null)
   const [running, setRunning] = React.useState(true)

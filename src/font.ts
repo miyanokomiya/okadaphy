@@ -26,11 +26,11 @@ export async function parseFont(text: string, style: ISvgStyle): Promise<ISvgPat
     pathList = pathList.concat(
       okageo.svg
         .parseOpenPath(font.getPath(line, 0, size * 1.1 * i, size))
-        .map(info => okageo.geo.omitSamePoint(info.d)),
+        .map((info) => okageo.geo.omitSamePoint(info.d)),
     )
   })
 
-  return okageo.geo.getIncludedPolygonGroups(pathList).map(group => {
+  return okageo.geo.getIncludedPolygonGroups(pathList).map((group) => {
     const [d, ...included] = group
     return { d, included, style }
   })

@@ -1341,10 +1341,10 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.3.tgz#bdfd69d61e464dcc81b25159c270d75a73c1a636"
   integrity sha512-Il2DtDVRGDcqjDtE+rF8iqg1CArehSK84HZJCT7AMITlyXRBpuPhqGLDQMowraqqu1coEaimg4ZOqggt6L6L+A==
 
-"@types/matter-js@^0.10.6":
-  version "0.10.6"
-  resolved "https://registry.yarnpkg.com/@types/matter-js/-/matter-js-0.10.6.tgz#d460f958a8e864c39205d86259743c345c73f841"
-  integrity sha512-gl6k1CUsYd4jOz2tjut1K7HpKijO43yez1krQ9X2wPozk0qrGtGoELIXTnUaazGN7ep2d21wjp24RadGYjqA7Q==
+"@types/matter-js@^0.14.4":
+  version "0.14.4"
+  resolved "https://registry.yarnpkg.com/@types/matter-js/-/matter-js-0.14.4.tgz#5d481b777677501da53c49a5e2b29fc65aa89f06"
+  integrity sha512-OmRZgx1m2JYp3W8qfN+QwOxEPOJybrM3w+s860a3s7nJnCKoDok3Qa/DUOlURgWr3mHpTGBBmUMMpR+inPZ53A==
 
 "@types/node@*", "@types/node@^12.7.2":
   version "12.7.3"

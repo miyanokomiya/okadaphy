@@ -13,7 +13,7 @@ export type Props = {
   onSubmit: (options: IConfig, force?: boolean) => void
 }
 
-const OptionForm: React.FC<Props> = props => {
+const OptionForm: React.FC<Props> = (props) => {
   const [draftText, setDraftText] = React.useState(props.config.text)
 
   const onInputDraftText = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -110,7 +110,7 @@ const OptionForm: React.FC<Props> = props => {
           <Typography>Gravity X</Typography>
           <Slider
             marks={[{ value: 0, label: '0' }]}
-            valueLabelFormat={v => v * 1000}
+            valueLabelFormat={(v) => v * 1000}
             step={0.0001}
             min={-0.05}
             max={0.05}
@@ -121,7 +121,7 @@ const OptionForm: React.FC<Props> = props => {
         <Grid item xs={12} sm={6}>
           <Typography>Gravity Y</Typography>
           <Slider
-            valueLabelFormat={v => v * 1000}
+            valueLabelFormat={(v) => v * 1000}
             marks={[{ value: 0, label: '0' }]}
             step={0.0001}
             min={-0.05}

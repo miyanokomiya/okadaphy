@@ -63,7 +63,12 @@ export default class App {
   public importFromDefault() {
     const pathInfoList = [
       {
-        d: [{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }, { x: 0, y: 10 }],
+        d: [
+          { x: 0, y: 0 },
+          { x: 10, y: 0 },
+          { x: 10, y: 10 },
+          { x: 0, y: 10 },
+        ],
         style: this.style,
       },
     ]
@@ -76,9 +81,9 @@ export default class App {
         this.canvas.width - margin * 2,
         this.canvas.height - margin * 2,
       )
-      .map(info => createShape(info))
+      .map((info) => createShape(info))
       .filter(<T>(info: T | null): info is T => !!info)
-      .forEach(s => {
+      .forEach((s) => {
         MBody.setAngularVelocity(s.body, 0.01)
         this.addShape(s)
       })
@@ -96,9 +101,9 @@ export default class App {
         this.canvas.width - margin * 2,
         this.canvas.height - margin * 2,
       )
-      .map(info => createShape(info))
+      .map((info) => createShape(info))
       .filter(<T>(info: T | null): info is T => !!info)
-      .forEach(s => this.addShape(s))
+      .forEach((s) => this.addShape(s))
     this.draw()
   }
 
@@ -113,9 +118,9 @@ export default class App {
         this.canvas.width - margin * 2,
         this.canvas.height - margin * 2,
       )
-      .map(info => createShape(info))
+      .map((info) => createShape(info))
       .filter(<T>(info: T | null): info is T => !!info)
-      .forEach(s => this.addShape(s))
+      .forEach((s) => this.addShape(s))
     this.draw()
   }
 
@@ -145,7 +150,7 @@ export default class App {
   public clear() {
     Engine.clear(this.engine)
     this.cursorDownPoint = null
-    this.shapeList.concat().forEach(s => this.removeShape(s))
+    this.shapeList.concat().forEach((s) => this.removeShape(s))
     this.shapeList = []
     this.slashList = []
   }
@@ -166,7 +171,7 @@ export default class App {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
     drawFrame(this.ctx)
 
-    this.shapeList.forEach(shape => {
+    this.shapeList.forEach((shape) => {
       this.ctx.save()
       this.ctx.translate(shape.body.position.x, shape.body.position.y)
       this.ctx.rotate(shape.body.angle)
@@ -180,7 +185,7 @@ export default class App {
 
     this.ctx.strokeStyle = 'yellow'
     this.ctx.lineWidth = 2
-    this.slashList.forEach(slash => {
+    this.slashList.forEach((slash) => {
       this.ctx.beginPath()
       this.ctx.moveTo(slash.line[0].x, slash.line[0].y)
       this.ctx.lineTo(slash.line[1].x, slash.line[1].y)
@@ -223,8 +228,8 @@ export default class App {
 
   private collisionActive(e: IEventCollision<Engine>) {
     e.pairs
-      .filter(pair => pair.timeUpdated - pair.timeCreated > 3000)
-      .forEach(pair => {
+      .filter((pair) => pair.timeUpdated - pair.timeCreated > 3000)
+      .forEach((pair) => {
         if (Math.random() < 0.99) return
 
         const shapeA = this.findShape(pair.bodyA.id)
@@ -242,9 +247,9 @@ export default class App {
 
   private findShape(id: number): IBodyShape | null {
     let shape: IBodyShape | null = null
-    this.shapeList.some(s => {
+    this.shapeList.some((s) => {
       // partsとして抱えるbodyも検索対象とする
-      s.body.parts.some(part => {
+      s.body.parts.some((part) => {
         if (part.id === id) shape = s
         return !!shape
       })
@@ -256,14 +261,14 @@ export default class App {
   private afterUpdate() {
     // this.pullCenter()
     // this.pullEachOther()
-    this.slashList.forEach(slash => slash.time++)
-    this.slashList = this.slashList.filter(slash => slash.time < 60)
+    this.slashList.forEach((slash) => slash.time++)
+    this.slashList = this.slashList.filter((slash) => slash.time < 60)
     this.draw()
   }
 
   private pullEachOther() {
-    this.shapeList.forEach(base => {
-      this.shapeList.forEach(shape => {
+    this.shapeList.forEach((base) => {
+      this.shapeList.forEach((shape) => {
         if (base.body.id === shape.body.id) return
 
         const vec = okageo.geo.sub(base.body.position, shape.body.position)
@@ -277,7 +282,7 @@ export default class App {
 
   private pullCenter() {
     const center = { x: this.canvas.width / 2, y: this.canvas.height / 2 }
-    this.shapeList.forEach(shape => {
+    this.shapeList.forEach((shape) => {
       const vec = okageo.geo.sub(center, shape.body.position)
       const d = okageo.geo.getNorm(vec)
       if (d < 1) return
@@ -308,13 +313,13 @@ export default class App {
 
   private slash(line: IVec2[]) {
     this.slashList.push({ line, time: 0 })
-    this.shapeList.concat().forEach(shape => {
+    this.shapeList.concat().forEach((shape) => {
       const splitedShapeList = splitShape(shape, line)
       if (!splitedShapeList) return
 
       // 分割前を削除して分割後を追加
       this.removeShape(shape)
-      splitedShapeList.forEach(s => this.addShape(s))
+      splitedShapeList.forEach((s) => this.addShape(s))
     })
 
     this.draw()

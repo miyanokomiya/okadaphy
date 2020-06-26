@@ -5910,10 +5910,10 @@ object.values@^1.1.0, object.values@^1.1.1:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-okageo@^1.1.7:
-  version "1.1.7"
-  resolved "https://registry.yarnpkg.com/okageo/-/okageo-1.1.7.tgz#7c7bf33b0c2f0e224cab980454fa62fe2532c9b2"
-  integrity sha512-17H3NejjjEdYjTPkLlwxZQWeG1F19/sc1CEkhCG0WObEbKX05vYAQXZEL28OjmGOBMGmlkIfEBAPrp24n92l7w==
+okageo@^1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/okageo/-/okageo-1.1.10.tgz#04c2673ea121694d9986c28a6161cde7b458ae57"
+  integrity sha512-kyYYtOo3jjDw675M4dYuxU9gMGlos+OOcW6dbOfCZgYd7ynnP5sWN/37QFxuDfiXq2+Uubwq6/ao8GBOJH8VkA==
   dependencies:
     bili "^4.8.1"
 

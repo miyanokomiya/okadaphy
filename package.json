@@ -28,7 +28,7 @@
     "eslint-plugin-jest": "^23.17.1",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.20.3",
-    "eslint-plugin-react-hooks": "^4.0.5",
+    "eslint-plugin-react-hooks": "^4.0.8",
     "jest": "^24.9.0",
     "parcel-bundler": "^1.12.4",
     "prettier": "^2.0.5",

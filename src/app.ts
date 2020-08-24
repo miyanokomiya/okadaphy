@@ -1,3 +1,5 @@
+import * as Comlink from 'comlink'
+
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
 import okageo, { IVec2, ISvgStyle } from 'okageo'
 import { IBodyShape, ISlash } from '../types/index'
@@ -16,6 +18,15 @@ function expandLine(a: IVec2, b: IVec2): IVec2[] {
   const v = okageo.geo.multi(okageo.geo.getUnit(okageo.geo.sub(b, a)), 4000)
   return [okageo.geo.sub(a, v), okageo.geo.add(a, v)]
 }
+
+const worker = new Worker('worker.ts')
+const workerWrap: any = Comlink.wrap(worker)
+;(async () => {
+  await workerWrap.sayName('me').then((t: string) => console.log(t))
+  await workerWrap.init({ width: 100, height: 200 })
+  await workerWrap.start()
+  await workerWrap.bindAfterUpdate(Comlink.proxy((t: number) => {}))
+})()
 
 export default class App {
   private canvas: HTMLCanvasElement

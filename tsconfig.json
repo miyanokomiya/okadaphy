@@ -8,6 +8,6 @@
     "declaration": true,
     "rootDir": "./src",
     "experimentalDecorators": true,
-    "lib": ["dom", "es2015"]
+    "lib": ["webworker", "dom", "es2015"]
   }
 }

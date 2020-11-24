@@ -1,4 +1,4 @@
-import { IVec2 } from 'okageo'
+import type { IVec2 } from 'okageo'
 
 export function getCursorPoint(e: MouseEvent | TouchEvent): IVec2 {
   const rect = (e.target as HTMLCanvasElement).getBoundingClientRect()

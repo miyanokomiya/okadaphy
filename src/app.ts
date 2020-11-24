@@ -1,5 +1,6 @@
 import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
-import okageo, { IVec2, ISvgStyle } from 'okageo'
+import * as okageo from 'okageo'
+import type { IVec2, ISvgStyle } from 'okageo'
 import { IBodyShape, ISlash } from '../types/index'
 import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
 import { createShape, mergeShape, splitShape } from './shape'
@@ -9,12 +10,12 @@ import { getCursorPoint } from './canvas'
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 ;(window as any).decomp = require('poly-decomp')
 
-okageo.svg.configs.bezierSplitSize = 8
-okageo.svg.configs.ellipseSplitSize = 8
+okageo.configs.bezierSplitSize = 8
+okageo.configs.ellipseSplitSize = 8
 
 function expandLine(a: IVec2, b: IVec2): IVec2[] {
-  const v = okageo.geo.multi(okageo.geo.getUnit(okageo.geo.sub(b, a)), 4000)
-  return [okageo.geo.sub(a, v), okageo.geo.add(a, v)]
+  const v = okageo.multi(okageo.getUnit(okageo.sub(b, a)), 4000)
+  return [okageo.sub(a, v), okageo.add(a, v)]
 }
 
 export default class App {
@@ -46,7 +47,7 @@ export default class App {
     this.shapeList = []
     this.slashList = []
     this.style = {
-      ...okageo.svg.createStyle(),
+      ...okageo.createStyle(),
       fill: true,
       fillStyle: 'gray',
       stroke: true,
@@ -73,7 +74,7 @@ export default class App {
       },
     ]
     const margin = FRAME_DEPTH * 14
-    okageo.svg
+    okageo
       .fitRect(
         pathInfoList,
         margin,
@@ -91,9 +92,9 @@ export default class App {
   }
 
   public importFromSVG(svgStr: string) {
-    const pathInfoList = okageo.svg.parseSvgGraphicsStr(svgStr)
+    const pathInfoList = okageo.parseSvgGraphicsStr(svgStr)
     const margin = FRAME_DEPTH
-    okageo.svg
+    okageo
       .fitRect(
         pathInfoList,
         margin,
@@ -110,7 +111,7 @@ export default class App {
   public async importFromString(text: string) {
     const pathInfoList = await parseFont(text, this.style)
     const margin = FRAME_DEPTH + 30
-    okageo.svg
+    okageo
       .fitRect(
         pathInfoList,
         margin,
@@ -175,7 +176,7 @@ export default class App {
       this.ctx.save()
       this.ctx.translate(shape.body.position.x, shape.body.position.y)
       this.ctx.rotate(shape.body.angle)
-      okageo.svg.draw(this.ctx, {
+      okageo.draw(this.ctx, {
         d: shape.vertices,
         included: shape.included,
         style: this.style,
@@ -271,10 +272,10 @@ export default class App {
       this.shapeList.forEach((shape) => {
         if (base.body.id === shape.body.id) return
 
-        const vec = okageo.geo.sub(base.body.position, shape.body.position)
-        const d = okageo.geo.getNorm(vec)
+        const vec = okageo.sub(base.body.position, shape.body.position)
+        const d = okageo.getNorm(vec)
         if (d < 1) return
-        const force = okageo.geo.multi(vec, (0.00001 * base.body.mass) / Math.pow(d, 2))
+        const force = okageo.multi(vec, (0.00001 * base.body.mass) / Math.pow(d, 2))
         MBody.applyForce(shape.body, shape.body.position, force)
       })
     })
@@ -283,10 +284,10 @@ export default class App {
   private pullCenter() {
     const center = { x: this.canvas.width / 2, y: this.canvas.height / 2 }
     this.shapeList.forEach((shape) => {
-      const vec = okageo.geo.sub(center, shape.body.position)
-      const d = okageo.geo.getNorm(vec)
+      const vec = okageo.sub(center, shape.body.position)
+      const d = okageo.getNorm(vec)
       if (d < 1) return
-      const force = okageo.geo.multi(vec, 0.00001 / Math.pow(d, 2))
+      const force = okageo.multi(vec, 0.00001 / Math.pow(d, 2))
       MBody.applyForce(shape.body, shape.body.position, force)
     })
   }
@@ -305,7 +306,7 @@ export default class App {
     e.preventDefault()
     if (!this.cursorDownPoint || !this.cursorMovePoint) return
 
-    if (okageo.geo.isSame(this.cursorDownPoint, this.cursorMovePoint)) return
+    if (okageo.isSame(this.cursorDownPoint, this.cursorMovePoint)) return
 
     this.slash(expandLine(this.cursorDownPoint, this.cursorMovePoint))
     this.cursorDownPoint = null

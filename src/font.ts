@@ -1,5 +1,6 @@
 import { Font, load } from 'opentype.js'
-import okageo, { IVec2, ISvgPath, ISvgStyle } from 'okageo'
+import * as okageo from 'okageo'
+import type { IVec2, ISvgPath, ISvgStyle } from 'okageo'
 
 let _font: Font | null
 const fontURL = 'https://fonts.gstatic.com/ea/notosansjapanese/v6/NotoSansJP-Medium.otf'
@@ -24,13 +25,13 @@ export async function parseFont(text: string, style: ISvgStyle): Promise<ISvgPat
   let pathList: IVec2[][] = []
   lines.forEach((line, i) => {
     pathList = pathList.concat(
-      okageo.svg
+      okageo
         .parseOpenPath(font.getPath(line, 0, size * 1.1 * i, size))
-        .map((info) => okageo.geo.omitSamePoint(info.d)),
+        .map((info) => okageo.omitSamePoint(info.d)),
     )
   })
 
-  return okageo.geo.getIncludedPolygonGroups(pathList).map((group) => {
+  return okageo.getIncludedPolygonGroups(pathList).map((group) => {
     const [d, ...included] = group
     return { d, included, style }
   })

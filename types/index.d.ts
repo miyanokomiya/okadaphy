@@ -1,5 +1,5 @@
 import { Body as MBody } from 'matter-js'
-import { ISvgStyle, IVec2 } from 'okageo'
+import type { ISvgStyle, IVec2 } from 'okageo'
 
 export interface IBodyShape {
   body: MBody

@@ -1425,10 +1425,10 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.3.tgz#bdfd69d61e464dcc81b25159c270d75a73c1a636"
   integrity sha512-Il2DtDVRGDcqjDtE+rF8iqg1CArehSK84HZJCT7AMITlyXRBpuPhqGLDQMowraqqu1coEaimg4ZOqggt6L6L+A==
 
-"@types/matter-js@^0.14.5":
-  version "0.14.5"
-  resolved "https://registry.yarnpkg.com/@types/matter-js/-/matter-js-0.14.5.tgz#3093bfc4496599b1f4cc99e5c8b30feeafc675a1"
-  integrity sha512-WAGhTov24lyLzb53jwGtyeP4o9kCn3Vz5qs1Mciffc2+lYP12dbLgfZ3b0Z69sy30etV4+vCyXcU4wvCt9R6kw==
+"@types/matter-js@^0.14.7":
+  version "0.14.7"
+  resolved "https://registry.yarnpkg.com/@types/matter-js/-/matter-js-0.14.7.tgz#b816f1e7b441ee7499027f9566e4fb5baea637b3"
+  integrity sha512-HLUhVTUoKsibpPZ2tCzoCC/f/UYRWPP9WCOUh5F61BlrUESFV5fE7eKq/CmdoEGkNrLW9v407zYlfrTc9hnGIw==
 
 "@types/node@*":
   version "12.7.3"

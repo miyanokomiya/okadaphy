@@ -5540,10 +5540,10 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-matter-js@^0.14.2:
-  version "0.14.2"
-  resolved "https://registry.yarnpkg.com/matter-js/-/matter-js-0.14.2.tgz#8169af9e06fdc356ba9e72b49624eb329839883b"
-  integrity sha512-3ttVT8cJlQnGRjBa8MyVrGyvGmnmOkZ3YsyemIw+KwEEdVi70mo32FH1Eta2b3GfdDJFbMDRqyMQt4heNKBUEA==
+matter-js@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/matter-js/-/matter-js-0.17.0.tgz#f5a7398bdb8773ec3c71e75369d4791b014ff250"
+  integrity sha512-KntcedmJ3KNqQRpDKrtB5218adlARy3YYjbqHDyz2qJ7WGvBzUVWCX8wrkipGWPMVrL99+DSe8bPUsenYBshhA==
 
 md5.js@^1.3.4:
   version "1.3.5"

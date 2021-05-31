@@ -6056,10 +6056,10 @@ object.values@^1.1.0, object.values@^1.1.1:
     function-bind "^1.1.1"
     has "^1.0.3"
 
-okageo@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/okageo/-/okageo-2.0.0.tgz#ac9f5c3c5e58a7f87f96f71877bd66474fe71313"
-  integrity sha512-w8FIy2Y1Kxcu048CLhrglYUbiOOAuBQxwqFzmnw1FPm0oYw2M55sv2duSsFxXwt/1WapdsJYNGhWjtg3FZqqrw==
+okageo@^2.0.9:
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/okageo/-/okageo-2.0.9.tgz#30e181cbddfebbf593af4101eadabe2b1aff4e1a"
+  integrity sha512-qdOJ4nwWTgoYub5sxrZVgBjV0a+D0j8OmlDdm9HSHHDoBxejrZijWSLnKK0FY0OoacpKV7rJUrV9D95f9wM4zQ==
 
 on-finished@~2.3.0:
   version "2.3.0"

@@ -6,6 +6,7 @@ import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
 import { createShape, mergeShape, splitShape } from './shape'
 import { parseFont } from './font'
 import { getCursorPoint } from './canvas'
+import { AppAudio } from './AppAudio'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
 ;(window as any).decomp = require('poly-decomp')
@@ -30,6 +31,7 @@ export default class App {
   private shapeList: IBodyShape[]
   private slashList: ISlash[]
   private style: ISvgStyle
+  private appAudio: AppAudio
 
   constructor(args: { canvas: HTMLCanvasElement }) {
     this.canvas = args.canvas
@@ -59,6 +61,8 @@ export default class App {
     this.draw()
     this.stop()
     this.initEventListener()
+
+    this.appAudio = new AppAudio()
   }
 
   public importFromDefault(): void {
@@ -324,5 +328,6 @@ export default class App {
     })
 
     this.draw()
+    this.appAudio.playSlash(Math.random())
   }
 }

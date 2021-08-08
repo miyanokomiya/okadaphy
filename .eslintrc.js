@@ -20,6 +20,7 @@ module.exports = {
     '@typescript-eslint/member-delimiter-style': 0,
     '@typescript-eslint/interface-name-prefix': 0,
     '@typescript-eslint/no-empty-function': 0,
+    '@typescript-eslint/ban-ts-comment': 0,
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
   },

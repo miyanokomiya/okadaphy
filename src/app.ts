@@ -61,7 +61,7 @@ export default class App {
     this.initEventListener()
   }
 
-  public importFromDefault() {
+  public importFromDefault(): void {
     const pathInfoList = [
       {
         d: [
@@ -91,7 +91,7 @@ export default class App {
     this.draw()
   }
 
-  public importFromSVG(svgStr: string) {
+  public importFromSVG(svgStr: string): void {
     const pathInfoList = okageo.parseSvgGraphicsStr(svgStr)
     const margin = FRAME_DEPTH
     okageo
@@ -108,7 +108,7 @@ export default class App {
     this.draw()
   }
 
-  public async importFromString(text: string) {
+  public async importFromString(text: string): Promise<void> {
     const pathInfoList = await parseFont(text, this.style)
     const margin = FRAME_DEPTH + 30
     okageo
@@ -125,30 +125,30 @@ export default class App {
     this.draw()
   }
 
-  public setGravity(x: number, y: number) {
+  public setGravity(x: number, y: number): void {
     this.engine.world.gravity.x = x
     this.engine.world.gravity.y = y
   }
 
-  public setStyle(style: Partial<ISvgStyle>) {
+  public setStyle(style: Partial<ISvgStyle>): void {
     this.style = { ...this.style, ...style }
   }
 
-  public run() {
+  public run(): void {
     Runner.start(this.runner, this.engine)
     this.running = true
   }
 
-  public stop() {
+  public stop(): void {
     Runner.stop(this.runner)
     this.running = false
   }
 
-  public step() {
+  public step(): void {
     Engine.update(this.engine)
   }
 
-  public clear() {
+  public clear(): void {
     Engine.clear(this.engine)
     this.cursorDownPoint = null
     this.shapeList.concat().forEach((s) => this.removeShape(s))
@@ -156,14 +156,14 @@ export default class App {
     this.slashList = []
   }
 
-  public dispose() {
+  public dispose(): void {
     this.stop()
     Engine.clear(this.engine)
     this.running = false
     this.clearEventListener()
   }
 
-  public isRunning() {
+  public isRunning(): boolean {
     return this.running
   }
 

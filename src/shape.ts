@@ -65,7 +65,7 @@ export function mergeShape(shapeA: IBodyShape, shapeB: IBodyShape): IBodyShape |
   return shape
 }
 
-export function getSlashForce(body: MBody, slash: IVec2[]) {
+export function getSlashForce(body: MBody, slash: IVec2[]): IVec2 {
   const toSlash = okageo.getUnit(okageo.sub(slash[1], slash[0]))
   const pedal = okageo.getPedal(body.position, slash)
   const toCross = okageo.getUnit(okageo.sub(body.position, pedal))

@@ -1726,10 +1726,10 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.9.tgz#97edc9037ea0c38585320b28964dde3b39e4660d"
   integrity sha512-qcUXuemtEu+E5wZSJHNxUXeCZhAfXKQ41D+duX+VYPde7xyEVZci+/oXKJL13tnRs9lR2pr4fod59GT6/X1/yQ==
 
-"@types/matter-js@^0.14.8":
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/@types/matter-js/-/matter-js-0.14.8.tgz#387ed5f8f30a81b7c9685ad7b685b88ebf8bf275"
-  integrity sha512-7Vjbb7VfkKA062tMwbeAFI5dBzdzvMoYXf2/7ROygjGTmWg7KxGJLPl0Vlck5kpFQOjLzdDqhuN2TWkrX/co+Q==
+"@types/matter-js@^0.17.6":
+  version "0.17.6"
+  resolved "https://registry.yarnpkg.com/@types/matter-js/-/matter-js-0.17.6.tgz#525bb33a7289105e1981ef51b987972fa9739011"
+  integrity sha512-i6WLNuM7/89SLqO2aOyaUkom9tc3B/qo4ekh7BD99xQ8+wOVVZO0F4RzKNYZCaFwr+xp3pK3oIb6sSVjLpz+pA==
 
 "@types/node@*":
   version "12.7.3"

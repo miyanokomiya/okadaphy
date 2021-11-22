@@ -13,7 +13,7 @@
     "test": "jest --coverage"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.24",
+    "@types/jest": "^27.0.3",
     "@types/opentype": "^0.0.4",
     "@types/react": "^17.0.16",
     "@types/react-color": "^3.0.5",

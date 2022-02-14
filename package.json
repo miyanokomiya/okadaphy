@@ -29,7 +29,7 @@
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
-    "jest": "^27.5.0",
+    "jest": "^27.5.1",
     "parcel-bundler": "^1.12.5",
     "prettier": "^2.5.1",
     "react-test-renderer": "^17.0.2",

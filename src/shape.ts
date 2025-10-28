@@ -1,7 +1,7 @@
 import { Bodies, Body as MBody, Vector, Vertices } from 'matter-js'
 import * as okageo from 'okageo'
 import type { ISvgPath, IVec2 } from 'okageo'
-import { IBodyShape } from '../types/index'
+import type { IBodyShape } from './types'
 
 export function createShape(path: ISvgPath): IBodyShape | null {
   // 同一座標を取り除いておく

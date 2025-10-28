@@ -4,9 +4,10 @@ import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
 import Slider from '@material-ui/core/Slider'
 import Typography from '@material-ui/core/Typography'
-import { CompactPicker, ColorResult } from 'react-color'
+import { CompactPicker } from 'react-color'
+import type { ColorResult } from 'react-color'
 import PropTypes from 'prop-types'
-import { IConfig } from '../../types'
+import type { IConfig } from '../types'
 
 export type Props = {
   config: IConfig

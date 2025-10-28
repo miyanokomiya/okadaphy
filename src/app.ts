@@ -1,7 +1,8 @@
-import { Body as MBody, Engine, Events, IEventCollision, Runner, World } from 'matter-js'
+import { Body as MBody, Engine, Events, Runner, World } from 'matter-js'
+import type { IEventCollision } from 'matter-js'
 import * as okageo from 'okageo'
 import type { IVec2, ISvgStyle } from 'okageo'
-import { IBodyShape, ISlash } from '../types/index'
+import type { IBodyShape, ISlash } from './types'
 import { drawFrame, FRAME_DEPTH, getFrameBodies } from './frame'
 import { createShape, mergeShape, splitShape } from './shape'
 import { parseFont } from './font'
@@ -9,7 +10,9 @@ import { getCursorPoint } from './canvas'
 import { AppAudio } from './AppAudio'
 
 // matterがdecompを使うが、parcelのせいかimportがうまくいかない
-;(window as any).decomp = require('poly-decomp')
+// @ts-ignore
+import decomp from 'poly-decomp'
+;(window as any).decomp = decomp;
 
 okageo.configs.bezierSplitSize = 8
 okageo.configs.ellipseSplitSize = 8

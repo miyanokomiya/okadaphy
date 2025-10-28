@@ -4,7 +4,7 @@ import { render } from 'react-dom'
 import Link from '@material-ui/core/Link'
 import Canvas from './components/Canvas'
 import ConfigForm from './components/ConfigForm'
-import { IConfig } from '../types'
+import type { IConfig } from './types'
 
 export const App: React.FC = () => {
   const [count, refresh] = React.useState(0)

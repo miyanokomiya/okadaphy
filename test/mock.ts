@@ -1,4 +1,4 @@
-import { IConfig } from '../types'
+import type { IConfig } from '../src/types'
 
 export const mockConfig = (): IConfig => {
   return {

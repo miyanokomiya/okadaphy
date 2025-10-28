@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import App from '../app'
-import { IConfig } from '../../types'
+import type { IConfig } from '../types'
 
 export type Props = {
   width?: number

@@ -5,9 +5,10 @@
   "repository": "https://github.com/miyanokomiya/okadaphy.git",
   "author": "miyanokomiya",
   "license": "MIT",
+  "packageManager": "pnpm@10.19.0",
   "scripts": {
     "dev": "vite --host",
-    "build": "vite build",
+    "build": "vite build --emptyOutDir",
     "type": "tsc --noEmit"
   },
   "devDependencies": {

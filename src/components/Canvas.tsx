@@ -1,5 +1,4 @@
 import * as React from 'react'
-import PropTypes from 'prop-types'
 import Grid from '@material-ui/core/Grid'
 import Button from '@material-ui/core/Button'
 import App from '../app'
@@ -78,24 +77,6 @@ const Canvas: React.FC<Props> = (props) => {
       </Grid>
     </div>
   )
-}
-
-Canvas.propTypes = {
-  width: PropTypes.number,
-  height: PropTypes.number,
-  config: PropTypes.shape({
-    text: PropTypes.string.isRequired,
-    fillStyle: PropTypes.string.isRequired,
-    strokeStyle: PropTypes.string.isRequired,
-    gravityX: PropTypes.number.isRequired,
-    gravityY: PropTypes.number.isRequired,
-  }).isRequired,
-  count: PropTypes.number,
-}
-Canvas.defaultProps = {
-  width: 300,
-  height: 300,
-  count: 0,
 }
 
 export default Canvas

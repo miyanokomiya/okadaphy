@@ -6,7 +6,6 @@ import Slider from '@material-ui/core/Slider'
 import Typography from '@material-ui/core/Typography'
 import { CompactPicker } from 'react-color'
 import type { ColorResult } from 'react-color'
-import PropTypes from 'prop-types'
 import type { IConfig } from '../types'
 
 export type Props = {
@@ -135,17 +134,5 @@ const OptionForm: React.FC<Props> = (props) => {
     </form>
   )
 }
-
-OptionForm.propTypes = {
-  config: PropTypes.shape({
-    text: PropTypes.string.isRequired,
-    fillStyle: PropTypes.string.isRequired,
-    strokeStyle: PropTypes.string.isRequired,
-    gravityX: PropTypes.number.isRequired,
-    gravityY: PropTypes.number.isRequired,
-  }).isRequired,
-  onSubmit: PropTypes.func.isRequired,
-}
-OptionForm.defaultProps = {}
 
 export default OptionForm

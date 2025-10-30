@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime'
 import * as React from 'react'
 import { render } from 'react-dom'
 import Link from '@material-ui/core/Link'

@@ -6,6 +6,10 @@ import { resolve } from "path";
 export default defineConfig({
   plugins: [react()],
   root: resolve(__dirname, "src"),
+  base: process.env.BASE_PATH || "/",
+  define: {
+    "process.env.__APP_VERSION__": JSON.stringify(process.env.TAG_NAME || "development"),
+  },
   build: {
     outDir: resolve(__dirname, "dist"),
     rollupOptions: {
